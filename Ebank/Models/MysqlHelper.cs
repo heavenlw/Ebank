@@ -7,7 +7,7 @@ namespace Ebank.Controllers
 {
     internal class MysqlHelper
     {
-        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["conn"];
+        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn2"];
         public MysqlHelper()
         {
         }
@@ -56,6 +56,55 @@ namespace Ebank.Controllers
                 }
             }
             return question_list;
+        }
+
+        internal object GetNews()
+        {
+            List<News> news_list = new List<News>();
+            string sql = string.Format("select * from bank_news");
+            DataSet testDataSet = null;
+            MySqlConnection conn = new MySqlConnection(connStr_local);
+            try
+            {
+                conn.Open();
+                // 创建一个适配器
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            // 关闭数据库连接.
+            catch (Exception e)
+            {
+                //log4net.ILog log = log4net.LogManager.GetLogger("MyLogger");
+                //log.Debug(e.Message);
+                Console.WriteLine(e.Message);
+                //return question_list;
+                //Console.ReadLine();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null)
+            {
+                foreach (DataRow testRow in testDataSet.Tables["result_data"].Rows)
+                {
+                    News one_news = new News();
+
+                    string title =testRow["title"].ToString();
+                    string summary = testRow["summary"].ToString();
+                    string url = testRow["url"].ToString();
+                    one_news.Title = title;
+                    one_news.Summary = summary;
+                    one_news.Url = url;
+                    news_list.Add(one_news);
+
+                }
+            }
+            return news_list;
         }
 
         internal bool SearchName(string name)
