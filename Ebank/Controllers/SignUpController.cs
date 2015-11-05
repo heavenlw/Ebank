@@ -7,6 +7,9 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security;
+using System.Web;
+using System.ServiceModel.Channels;
+
 namespace Ebank.Controllers
 {
     public class SignUpController : ApiController
@@ -30,6 +33,23 @@ namespace Ebank.Controllers
                 return Ok(mysqlhelper.GetQuestionList());
             }
             else return null;
+        }
+        [HttpGet]
+        public string checkip()
+        {
+            return GetClientIp();
+        }
+        [HttpGet]
+        public bool CheckID(string hkid)
+        {
+
+         // string value =   GetClientIp(null);
+                //MysqlHelper mysqlhelper = new MysqlHelper();
+
+                MysqlHelper mysqlhelper = new MysqlHelper();
+                //return mysqlhelper.GetQuestionList();
+                return mysqlhelper.CheckId(hkid);
+        
         }
         [HttpGet]
         public bool NameSearch(string name)
@@ -68,6 +88,29 @@ namespace Ebank.Controllers
             user.Question_Id = 1;
             user.Question_Answer = "luowei";
             return JsonConvert.SerializeObject(user);
+        }
+        [HttpGet]
+        private string GetClientIp(HttpRequestMessage request = null)
+        {
+            request = request ?? Request;
+
+            if (request.Properties.ContainsKey("MS_HttpContext"))
+            {
+                return ((HttpContextWrapper)request.Properties["MS_HttpContext"]).Request.UserHostAddress;
+            }
+            else if (request.Properties.ContainsKey(RemoteEndpointMessageProperty.Name))
+            {
+                RemoteEndpointMessageProperty prop = (RemoteEndpointMessageProperty)request.Properties[RemoteEndpointMessageProperty.Name];
+                return prop.Address;
+            }
+            else if (HttpContext.Current != null)
+            {
+                return HttpContext.Current.Request.UserHostAddress;
+            }
+            else
+            {
+                return null;
+            }
         }
 
 

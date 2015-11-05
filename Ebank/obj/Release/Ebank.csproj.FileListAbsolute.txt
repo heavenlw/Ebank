@@ -81,3 +81,6 @@ E:\Github_Code\Ebank\Ebank\bin\HtmlAgilityPack.xml
 E:\Github_Code\Ebank\Ebank\obj\Release\Ebank.csprojResolveAssemblyReference.cache
 E:\Github_Code\Ebank\Ebank\obj\Release\Ebank.dll
 E:\Github_Code\Ebank\Ebank\obj\Release\Ebank.pdb
+E:\Github_Code\Ebank\Ebank\bin\System.Web.Cors.dll
+E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Cors.dll
+E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Cors.xml
