@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -15,6 +16,12 @@ namespace Ebank.Controllers
             
             MysqlHelper mysqlhelper = new MysqlHelper();
             return mysqlhelper.GetUserQueston(name);
+        }
+        [HttpPost]
+        public string LoginUser([FromBody]User user)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+           return  mysqlhelper.SearchUser(user);
         }
     }
 }

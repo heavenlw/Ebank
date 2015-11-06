@@ -58,6 +58,59 @@ namespace Ebank.Controllers
             return question_list;
         }
 
+        internal string  SearchUser(User user)
+        {
+            string sql = string.Format("select * from user where name = '{0}'", user.Name);
+            DataSet testDataSet = null;
+            MySqlConnection conn = new MySqlConnection(connStr_local);
+            try
+            {
+                conn.Open();
+                // 创建一个适配器
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            // 关闭数据库连接.
+            catch (Exception e)
+            {
+                //log4net.ILog log = log4net.LogManager.GetLogger("MyLogger");
+                //log.Debug(e.Message);
+                Console.WriteLine(e.Message);
+                //Console.ReadLine();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
+            {
+                if (testDataSet.Tables["result_data"].Rows[0]["password"].ToString() == user.Password)
+                {
+                    return "Success";
+                }
+                else
+                {
+                    return "Password Error";
+                }
+            }
+            else
+            {
+                try
+                {
+                    return "No this user";
+                }
+                catch (Exception t)
+                {
+                    return "System Error";
+                }
+            }
+        }
+
+
         internal Question GetUserQueston(string name)
         {
             Question question = new Question();
