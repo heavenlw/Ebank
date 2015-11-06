@@ -9,5 +9,12 @@ namespace Ebank.Controllers
 {
     public class LoginController : ApiController
     {
+        [HttpGet]
+        public Question getquestion(string name)
+        {
+            
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            return mysqlhelper.GetUserQueston(name);
+        }
     }
 }

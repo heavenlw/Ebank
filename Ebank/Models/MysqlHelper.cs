@@ -58,6 +58,50 @@ namespace Ebank.Controllers
             return question_list;
         }
 
+        internal Question GetUserQueston(string name)
+        {
+            Question question = new Question();
+            string sql = string.Format("select q.id,q.question from user u,question_list q where u.name = '{0}' and u.question_id = q.id", name);
+            DataSet testDataSet = null;
+            MySqlConnection conn = new MySqlConnection(connStr_local);
+            try
+            {
+                conn.Open();
+                // 创建一个适配器
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            // 关闭数据库连接.
+            catch (Exception e)
+            {
+                //log4net.ILog log = log4net.LogManager.GetLogger("MyLogger");
+                //log.Debug(e.Message);
+                Console.WriteLine(e.Message);
+                //Console.ReadLine();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
+            {
+                //Question question = new Question();
+                question.Word = testDataSet.Tables["result_data"].Rows[0]["question"].ToString();
+                question.Id = Convert.ToInt32(testDataSet.Tables["result_data"].Rows[0]["id"].ToString());
+                return question;
+            }
+            else
+            {
+                return null;
+            }
+           // return null;
+               
+        }
+
         internal bool CheckId(string hkid)
         {
             string sql = string.Format("select * from user where hk_id ='{0}'",hkid);
