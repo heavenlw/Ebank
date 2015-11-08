@@ -7,7 +7,7 @@ namespace Ebank.Controllers
 {
     internal class MysqlHelper
     {
-        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn2"];
+        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn1"];
         public MysqlHelper()
         {
         }
@@ -56,6 +56,58 @@ namespace Ebank.Controllers
                 }
             }
             return question_list;
+        }
+
+        internal bool UpdateTheUser(User user)
+        {
+            string sql = string.Format("update user set name='{0}',password='{1}',sign_up_date='{2}',question_id='{3}',question_answer='{4}',status=1 where hk_id='{5}'",user.Name,user.Password,DateTime.Now,user.Question_Id,user.Question_Answer,user.Hk_Id);
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+                string sql_two = string.Format("select * from user where hk_id='{0}'", user.Hk_Id);
+
+                DataSet testDataSet_2 = new DataSet();
+                try
+                {
+                    
+                    adapter = new MySqlDataAdapter(sql_two, conn);
+                    adapter.Fill(testDataSet_2, "result_data");
+
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+                if (testDataSet_2 != null && testDataSet_2.Tables["result_data"] != null && testDataSet_2.Tables["result_data"].Rows != null && testDataSet_2.Tables["result_data"].Rows.Count > 0)
+                {
+                    if (testDataSet_2.Tables["result_data"].Rows[0]["status"].ToString() == "1")
+                        return true;
+                    else
+                        return false;
+
+                }
+                else
+                    return false;
+            }
+            catch (Exception e)
+            {
+                error = e.Message;
+
+                return false;
+            }
+            finally
+            {
+                conn.Close();
+            }
+            return false;
         }
 
         internal string  SearchUser(User user)
@@ -155,9 +207,9 @@ namespace Ebank.Controllers
                
         }
 
-        internal bool CheckId(string hkid)
+        internal bool CheckId(string hkid,string type)
         {
-            string sql = string.Format("select * from user where hk_id ='{0}'",hkid);
+            string sql = string.Format("select * from user where hk_id ='{0}' and hk_id_type='{1}'",hkid,type);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -186,7 +238,13 @@ namespace Ebank.Controllers
             if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
             {
 
-                return true;
+                if (testDataSet.Tables["result_data"].Rows[0]["status"].ToString() == "0")
+                {
+                    return false;
+                }
+                else
+                    return true;
+                
 
             }
             else

@@ -15,24 +15,13 @@ namespace Ebank.Controllers
     public class SignUpController : ApiController
     {
         [HttpGet]
-        public IHttpActionResult GetQuestion(string question)
+        public IHttpActionResult GetQuestion()
         {
 
-            User user = new User();
-            user.Name = "Awol";
-            user.Password = "test";
-            user.Hk_Id = "11";
-            user.Question_Id = 1;
-            user.Question_Answer = "luowei";
-            string json = JsonConvert.SerializeObject(user);
-            //MysqlHelper mysqlhelper = new MysqlHelper();
-            if (question == "1")
-            {
                 MysqlHelper mysqlhelper = new MysqlHelper();
                 //return mysqlhelper.GetQuestionList();
                 return Ok(mysqlhelper.GetQuestionList());
-            }
-            else return null;
+        
         }
         [HttpGet]
         public string checkip()
@@ -40,7 +29,7 @@ namespace Ebank.Controllers
             return GetClientIp();
         }
         [HttpGet]
-        public bool CheckID(string hkid)
+        public bool CheckID(string hkid,string type)
         {
 
          // string value =   GetClientIp(null);
@@ -48,30 +37,22 @@ namespace Ebank.Controllers
 
                 MysqlHelper mysqlhelper = new MysqlHelper();
                 //return mysqlhelper.GetQuestionList();
-                return mysqlhelper.CheckId(hkid);
+                return mysqlhelper.CheckId(hkid,type);
         
         }
         [HttpGet]
         public bool NameSearch(string name)
-        {
+            {
             MysqlHelper mysqlhelper = new MysqlHelper();
             return mysqlhelper.SearchName(name);
         }
         [HttpPost]
-        public string CreateUser([FromBody]User users)
+        public bool CreateUser([FromBody]User users)
         {
-            //XmlDocument xdoc = new XmlDocument();
-            string xml = "<code>luowei</code>";
 
-            string secode = Awol.SecurityHelper.GenerateMD5Hash(DateTime.Now.ToString());
-           // string code = System.
-            User user = new User();
-            user.Name = "Awol";
-            user.Password = "test";
-            user.Hk_Id = "11";
-            user.Question_Id = 1;
-            user.Question_Answer = "luowei";
-           return   JsonConvert.SerializeObject(user);
+           
+            MysqlHelper mysqlhelper = new MysqlHelper();
+          return   mysqlhelper.UpdateTheUser(users);
         }
         [HttpPost]
         public string CreateAccount([FromBody]User users)
@@ -89,6 +70,7 @@ namespace Ebank.Controllers
             user.Question_Answer = "luowei";
             return JsonConvert.SerializeObject(user);
         }
+      
         [HttpGet]
         private string GetClientIp(HttpRequestMessage request = null)
         {
@@ -111,6 +93,12 @@ namespace Ebank.Controllers
             {
                 return null;
             }
+        }
+
+        [HttpPost]
+        public string CheckBase([FromBody]User user)
+        {
+            return null;
         }
 
 
