@@ -71,7 +71,7 @@ namespace Ebank.Controllers
             return JsonConvert.SerializeObject(user);
         }
       
-        [HttpGet]
+       
         private string GetClientIp(HttpRequestMessage request = null)
         {
             request = request ?? Request;

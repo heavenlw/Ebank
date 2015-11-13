@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.ServiceModel.Channels;
+using System.Web;
 using System.Web.Http;
 
 namespace Ebank.Controllers
@@ -20,8 +22,55 @@ namespace Ebank.Controllers
         [HttpPost]
         public string LoginUser([FromBody]User user)
         {
-            MysqlHelper mysqlhelper = new MysqlHelper();
-           return  mysqlhelper.SearchUser(user);
+             MysqlHelper mysqlhelper = new MysqlHelper();
+           // return "Success";
+          var status =   mysqlhelper.SearchUser(user);
+            if (status.Status == "Success")
+            {
+              string ip =   GetClientIp();
+                {
+                    mysqlhelper.UpdateLoginStatus(status,ip);
+                }
+            }
+            return status.Status;
         }
+        [HttpPost]
+        public string CheckQuestion([FromBody]User user)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            var status= mysqlhelper.CheckQestion(user);
+            if (status.Status == "Success")
+            {
+                string ip = GetClientIp();
+                {
+                    mysqlhelper.UpdateLoginStatus(status, ip);
+                }
+            }
+            return status.Status;
+
+        }
+        private string GetClientIp(HttpRequestMessage request = null)
+        {
+            request = request ?? Request;
+
+            if (request.Properties.ContainsKey("MS_HttpContext"))
+            {
+                return ((HttpContextWrapper)request.Properties["MS_HttpContext"]).Request.UserHostAddress;
+            }
+            else if (request.Properties.ContainsKey(RemoteEndpointMessageProperty.Name))
+            {
+                RemoteEndpointMessageProperty prop = (RemoteEndpointMessageProperty)request.Properties[RemoteEndpointMessageProperty.Name];
+                return prop.Address;
+            }
+            else if (HttpContext.Current != null)
+            {
+                return HttpContext.Current.Request.UserHostAddress;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
     }
 }

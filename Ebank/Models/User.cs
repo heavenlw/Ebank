@@ -10,6 +10,7 @@
         public string RealName { get; set; }
         public string Service_Code { get; set; }
         public string Id_Type{get;set;}
-
+        public string Id { get; internal set; }
+        public string Status { get; internal set; }
     }
 }
