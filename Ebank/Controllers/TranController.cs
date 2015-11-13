@@ -15,14 +15,36 @@ namespace Ebank.Controllers
             MysqlHelper mysqlhelper = new MysqlHelper();
           return   mysqlhelper.GetBankList();
         }
-        public string 
+        public string CheckAndChange(Trans trans)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            var status = mysqlhelper.ChecktheAccount(trans);
+            if (status == "success")
+            {
+                return mysqlhelper.UpdateAccount(trans);
+            }
+            else
+            {
+                return status;
+            }
+
+
+        }
 
         [HttpPost]
         public string Transfer([FromBody]Trans trans)
         {
-            
-            MysqlHelper mysqlhelper = new MysqlHelper();
-            return mysqlhelper.TransPush(trans);
+            return "Success";
+         var status = CheckAndChange(trans);
+            if (status == "Success")
+            {
+                MysqlHelper mysqlhelper = new MysqlHelper();
+                return mysqlhelper.TransPush(trans);
+            }
+            else
+            {
+                return "false";
+            }
         }
         public string CheckPassword([FromBody]Card card)
         {

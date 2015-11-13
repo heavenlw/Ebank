@@ -17,6 +17,12 @@ namespace Ebank.Controllers
             var user_id = mysqlhelper.SearchID(user.Name, user.Password);
            return  mysqlhelper.GetAllSavingAccount(user_id);
         }
-        //public List
+        [HttpPost]
+        public List<History> GetHisList([FromBody]History history)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+        return    mysqlhelper.GetUserHistory(history);
+
+        }
     }
 }
