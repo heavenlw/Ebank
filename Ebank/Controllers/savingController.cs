@@ -18,10 +18,23 @@ namespace Ebank.Controllers
            return  mysqlhelper.GetAllSavingAccount(user_id);
         }
         [HttpPost]
-        public List<History> GetHisList([FromBody]History history)
+        public string GetHisList([FromBody]History history)
         {
+            var html = "";
             MysqlHelper mysqlhelper = new MysqlHelper();
-        return    mysqlhelper.GetUserHistory(history);
+           List<History> his_list =  mysqlhelper.GetUserHistory(history);
+            foreach (History his in his_list)
+            {
+                if (his.Type == "1")
+                {
+                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>","Out",his.From,his.To,his.Amount,his.InsertTime);
+                }
+                if (his.Type== "2")
+                {
+                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>", "In", his.From, his.To, his.Amount, his.InsertTime);
+                }
+            }
+            return html;
 
         }
     }

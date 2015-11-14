@@ -61,7 +61,7 @@ namespace Ebank.Controllers
         internal List<History> GetUserHistory(History history)
         {
             List<History> list = new List<History>();
-            string sql = string.Format("select * from trans_log where user_id='{0}'",history.User_Id);
+            string sql = string.Format("select * from trans_log where user_id='{0}' order by insert_time desc",history.User_Id);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -92,16 +92,26 @@ namespace Ebank.Controllers
             {
                 foreach (DataRow testRow in testDataSet.Tables["result_data"].Rows)
                 {
-                    Bank bank = new Bank();
-                    int id = Convert.ToInt32(testRow["id"].ToString());
-                    string name = testRow["name"].ToString();
-                    bank.Id = id;
-                    bank.Word = name;
-                    bank_list.Add(bank);
+                    History one_history = new History();
+                    string From = testRow["tr_from"].ToString();
+                   string  To = testRow["tr_to"].ToString();
+                    string insert_time = testRow["insert_time"].ToString();
+                    string finish_time = testRow["finish_time"].ToString();
+                    string status = testRow["status"].ToString();
+                    string amount = testRow["amount"].ToString();
+                    string type = testRow["type"].ToString();
+                    one_history.From = From;
+                    one_history.To = To;
+                    one_history.InsertTime = insert_time;
+                    one_history.Amount = amount;
+                    //one_history.FinishTime = finish_time;
+                    one_history.Status = status;
+                    one_history.Type = type;
+                    list.Add(one_history);
 
                 }
             }
-            return bank_list;
+            return list;
         }
 
         internal string UpdateAccount(Trans trans)
@@ -174,7 +184,7 @@ namespace Ebank.Controllers
 
         internal Card CheckSavingAccount(ref Card card)
         {
-            string sql = string.Format("select * from saving_account where id='{0}'",card.No);
+            string sql = string.Format("select * from saving_account where id='{0}'",card.Id);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -232,12 +242,28 @@ namespace Ebank.Controllers
 
         private void updateErrorPassword(Card card)
         {
-            throw new NotImplementedException();
+            string sql = string.Format("update saving_account set error_count = error_count+1 where id='{0}'", card.Id);
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            catch (Exception t)
+            {
+
+            }
         }
 
         internal string TransPush(Trans trans)
         {
-            string sql = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}'", trans.From,trans.To,trans.Amount);
+            string sql = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type=1", trans.From,trans.To,trans.Amount);
             string error = null;
             MySqlConnection conn = null;
             try

@@ -34,8 +34,8 @@ namespace Ebank.Controllers
         [HttpPost]
         public string Transfer([FromBody]Trans trans)
         {
-            return "Success";
-         var status = CheckAndChange(trans);
+            //return "Success";
+            var status = CheckAndChange(trans);
             if (status == "Success")
             {
                 MysqlHelper mysqlhelper = new MysqlHelper();
@@ -51,5 +51,17 @@ namespace Ebank.Controllers
             MysqlHelper mysqlhelper = new MysqlHelper();
           return   mysqlhelper.CheckSavingAccount(ref card).Status;
         }
+        [HttpPost]
+        public string CheckRec([FromBody] Card card)
+        {
+            return "Success";
+
+        }
+        [HttpPost]
+        public string CheckBalance([FromBody]Card card)
+        {
+            return "Success";
+        }
+
     }   
 }
