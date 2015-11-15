@@ -18,6 +18,14 @@ namespace Ebank.Controllers
            return  mysqlhelper.GetAllSavingAccount(user_id);
         }
         [HttpPost]
+        public List<Saving> CheckAccountById(User user)
+        {
+
+                MysqlHelper mysqlhelper = new MysqlHelper();
+            //var user_id = mysqlhelper.SearchID(user.Name, user.Password);
+            return mysqlhelper.GetAllSavingAccount(user.Id);
+        }
+        [HttpPost]
         public string GetHisList([FromBody]History history)
         {
             var html = "";
@@ -37,5 +45,6 @@ namespace Ebank.Controllers
             return html;
 
         }
+        //public string GetSavingAccount()
     }
 }

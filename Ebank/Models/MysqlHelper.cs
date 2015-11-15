@@ -7,7 +7,7 @@ namespace Ebank.Controllers
 {
     internal class MysqlHelper
     {
-        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn1"];
+        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn2"];
         public MysqlHelper()
         {
         }
@@ -138,7 +138,7 @@ namespace Ebank.Controllers
 
         internal string ChecktheAccount(Trans tran)
         {
-            string sql = string.Format("select * from saving_account where id='{0}'", tran.From);
+            string sql = string.Format("select * from saving_account where card_num='{0}'", tran.From);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -184,7 +184,7 @@ namespace Ebank.Controllers
 
         internal Card CheckSavingAccount(ref Card card)
         {
-            string sql = string.Format("select * from saving_account where id='{0}'",card.Id);
+            string sql = string.Format("select * from saving_account where card_num='{0}'",card.Id);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -263,7 +263,7 @@ namespace Ebank.Controllers
 
         internal string TransPush(Trans trans)
         {
-            string sql = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type=1", trans.From,trans.To,trans.Amount);
+            string sql = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type=1,user_id='{3}'", trans.From,trans.To,trans.Amount,trans.User_Id);
             string error = null;
             MySqlConnection conn = null;
             try

@@ -43,7 +43,7 @@ namespace Ebank.Controllers
             }
             else
             {
-                return "false";
+                return status;
             }
         }
         public string CheckPassword([FromBody]Card card)
