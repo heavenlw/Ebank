@@ -17,5 +17,7 @@
         public string Code { get; internal set; }
         public string Bank_Name { get; internal set; }
         public string Bank_Address { get; internal set; }
+        public string User_Id { get; set; }
+        
     }
 }

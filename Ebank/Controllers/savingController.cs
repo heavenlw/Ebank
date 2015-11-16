@@ -33,14 +33,9 @@ namespace Ebank.Controllers
            List<History> his_list =  mysqlhelper.GetHistory(history);
             foreach (History his in his_list)
             {
-                if (his.Type == "1")
-                {
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>","Out",his.From,his.To,his.Amount,his.InsertTime);
-                }
-                if (his.Type== "2")
-                {
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>", "In", his.From, his.To, his.Amount, his.InsertTime);
-                }
+               
+                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",his.Type,his.From,his.To,his.Amount,his.InsertTime);
+              
             }
             return html;
 
@@ -53,14 +48,9 @@ namespace Ebank.Controllers
             List<History> his_list = mysqlhelper.GetAccountHistory(history);
             foreach (History his in his_list)
             {
-                if (his.Type == "1")
-                {
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>", "Out", his.InsertTime,his.Amount, his.Currency);
-                }
-                if (his.Type == "2")
-                {
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>", "In", his.InsertTime, his.Amount, his.Currency);
-                }
+                  html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>", his.Type, his.InsertTime,his.Amount, his.Currency);
+               
+               
             }
             return html;
 

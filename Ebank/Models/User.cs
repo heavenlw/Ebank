@@ -13,5 +13,8 @@
         public string Id { get;  set; }
         public string Status { get;  set; }
         public string Address { get; internal set; }
+
+        public string Session { get; set; }
+        
     }
 }

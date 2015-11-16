@@ -83,7 +83,9 @@ namespace Ebank.Controllers
         [HttpPost]
         public string Swift(Swift swift)
         {
-            return "Success";
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            var status =  mysqlhelper.OverSeaTrans(swift);
+            return status;
         }
 
     }   

@@ -13,6 +13,13 @@ namespace Ebank.Controllers
     public class LoginController : ApiController
     {
         [HttpGet]
+        public List<Curr> getCurrency()
+        {
+
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            return mysqlhelper.GetCurrency();
+        }
+        [HttpGet]
         public Question getquestion(string name)
         {
             
@@ -20,22 +27,22 @@ namespace Ebank.Controllers
             return mysqlhelper.GetUserQueston(name);
         }
         [HttpPost]
-        public string LoginUser([FromBody]User user)
+        public User LoginUser([FromBody]User user)
         {
              MysqlHelper mysqlhelper = new MysqlHelper();
            // return "Success";
           var status =   mysqlhelper.SearchUser(user);
             if (status.Status == "Success")
             {
-              string ip =   GetClientIp();
+              string ip =  GetClientIp();
                 {
                     mysqlhelper.UpdateLoginStatus(status,ip);
                 }
             }
-            return status.Status;
+            return status;
         }
         [HttpPost]
-        public string CheckQuestion([FromBody]User user)
+        public User CheckQuestion([FromBody]User user)
         {
             MysqlHelper mysqlhelper = new MysqlHelper();
             var status= mysqlhelper.CheckQestion(user);
@@ -46,7 +53,7 @@ namespace Ebank.Controllers
                     mysqlhelper.UpdateLoginStatus(status, ip);
                 }
             }
-            return status.Status;
+            return status;
 
         }
         private string GetClientIp(HttpRequestMessage request = null)
