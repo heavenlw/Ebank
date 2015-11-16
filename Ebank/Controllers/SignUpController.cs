@@ -21,7 +21,7 @@ namespace Ebank.Controllers
                 MysqlHelper mysqlhelper = new MysqlHelper();
                 //return mysqlhelper.GetQuestionList();
                 return Ok(mysqlhelper.GetQuestionList());
-        
+            
         }
         [HttpGet]
         public string checkip()

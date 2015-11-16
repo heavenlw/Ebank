@@ -12,5 +12,6 @@
         public string Id_Type{get;set;}
         public string Id { get;  set; }
         public string Status { get;  set; }
+        public string Address { get; internal set; }
     }
 }

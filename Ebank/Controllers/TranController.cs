@@ -38,8 +38,16 @@ namespace Ebank.Controllers
             var status = CheckAndChange(trans);
             if (status == "Success")
             {
-                MysqlHelper mysqlhelper = new MysqlHelper();
-                return mysqlhelper.TransPush(trans);
+                if (trans.Type == "1")
+                {
+                    MysqlHelper mysqlhelper = new MysqlHelper();
+                    return mysqlhelper.TransPush(trans);
+                }
+                else
+                {
+                    return "Not a Transfer";
+                }
+               
             }
             else
             {
@@ -59,6 +67,21 @@ namespace Ebank.Controllers
         }
         [HttpPost]
         public string CheckBalance([FromBody]Card card)
+        {
+            return "Success";
+        }
+
+        [HttpGet]
+        public Swift CheckSwift(string code)
+        {
+            Swift swift = new Swift();
+            swift.Code = "BKCHCNBJ42A";
+            swift.Bank_Name = "BANK OF CHINA GUANGZHOU BRANCH";
+            swift.Bank_Address = "19 CHANGDI ROAD - GUANGZHOU - CHINA";
+            return swift;
+        }
+        [HttpPost]
+        public string Swift(Swift swift)
         {
             return "Success";
         }

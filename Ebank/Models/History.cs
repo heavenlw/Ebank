@@ -14,5 +14,8 @@ namespace Ebank.Controllers
         public string FinishTime { get; internal set; }
         public string Amount { get; internal set; }
         public string Type { get; internal set; }
+        public string Account { get; set; }
+        public string Currency { get; set; }
+        public string Summary { get; internal set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Ebank.Controllers
 {
     internal class MysqlHelper
     {
-        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn2"];
+        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn1"];
         public MysqlHelper()
         {
         }
@@ -58,10 +58,153 @@ namespace Ebank.Controllers
             return question_list;
         }
 
-        internal List<History> GetUserHistory(History history)
+        internal void PushToRepayLog(Repay repayment)
+        {
+            string sql_1 = string.Format("insert into repayment_log set bill_id='{0}',amount='{1}',repay_account='{2}',type='{3}';", repayment.Bill_Id,repayment.Amount,repayment.Repay_Account,repayment.Type);
+           
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql_1, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+               
+            }
+            catch (Exception t)
+            {
+               
+            }
+        }
+
+        internal List<Credit> GetAllCreditAccount(string user_id)
+        {
+            List<Credit> credit_list = new List<Credit>();
+            string sql = string.Format("select * from credit_account where user_id ='{0}'", user_id);
+            DataSet testDataSet = null;
+            MySqlConnection conn = new MySqlConnection(connStr_local);
+            try
+            {
+                conn.Open();
+                // 创建一个适配器
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            // 关闭数据库连接.
+            catch (Exception e)
+            {
+                //log4net.ILog log = log4net.LogManager.GetLogger("MyLogger");
+                //log.Debug(e.Message);
+                Console.WriteLine(e.Message);
+                //Console.ReadLine();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
+            {
+                foreach (DataRow testRow in testDataSet.Tables["result_data"].Rows)
+                {
+                    Credit credit_card = new Credit();
+                    string Account_Id = testRow["id"].ToString();
+                    string card_num = testRow["card_num"].ToString();
+                    string credit_amount = testRow["credit_amount"].ToString();
+                    string branch_id = testRow["branch_id"].ToString();
+                    string type = testRow["type"].ToString();
+                    string currency_id = testRow["currency_id"].ToString();
+                    string status = testRow["status"].ToString();
+                    string a_credit = testRow["available_credit"].ToString();
+                    credit_card.Id = Account_Id;
+                    credit_card.No = card_num;
+                    credit_card.Amount = credit_amount;
+                    credit_card.Branch_Id = branch_id;
+                    credit_card.Type = type;
+                    credit_card.Currency = currency_id;
+                    credit_card.Status = status;
+                    credit_card.A_Credit = a_credit;
+                    credit_list.Add(credit_card);
+                 
+                }
+            }
+            else
+            {
+                return null;
+            }
+            return credit_list;
+        }
+
+        internal List<History> GetAccountHistory(History history)
         {
             List<History> list = new List<History>();
-            string sql = string.Format("select * from trans_log where user_id='{0}' order by insert_time desc",history.User_Id);
+            string sql = string.Format("select * from consumption_log where account='{0}' order by date desc", history.Account);
+            DataSet testDataSet = null;
+            MySqlConnection conn = new MySqlConnection(connStr_local);
+            try
+            {
+                conn.Open();
+                // 创建一个适配器
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            // 关闭数据库连接.
+            catch (Exception e)
+            {
+                //log4net.ILog log = log4net.LogManager.GetLogger("MyLogger");
+                //log.Debug(e.Message);
+                Console.WriteLine(e.Message);
+                return list;
+                //Console.ReadLine();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null)
+            {
+                foreach (DataRow testRow in testDataSet.Tables["result_data"].Rows)
+                {
+                    History one_history = new History();
+                    string From = testRow["account"].ToString();
+                    string To = testRow["to_account"].ToString();
+                    string insert_time = testRow["date"].ToString();
+                    string currency = testRow["currency"].ToString();
+                    string status = testRow["status"].ToString();
+                    string amount = testRow["amount"].ToString();
+                    string type = testRow["type"].ToString();
+                    string summary = testRow["summary"].ToString();
+                    one_history.From = From;
+                    one_history.To = To;
+                    one_history.InsertTime = insert_time;
+                    one_history.Amount = amount;
+                    //one_history.FinishTime = finish_time;
+                    one_history.Status = status;
+                    one_history.Type = type;
+                    one_history.Currency = currency;
+                    one_history.Summary = summary;
+                    list.Add(one_history);
+
+                }
+            }
+            return list;
+        }
+
+        internal List<History> GetHistory(History history)
+        {
+            List<History> list = new List<History>();
+            string sql = string.Format("select * from consumption_log where user_id='{0}' order by insert_time desc", history.User_Id);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -116,7 +259,7 @@ namespace Ebank.Controllers
 
         internal string UpdateAccount(Trans trans)
         {
-            string sql = string.Format("update saving_account set balance= balance-'{0}' where id='{1}'",trans.Amount,trans.From);
+            string sql = string.Format("update saving_account set balance= balance-'{0}' where card_num='{1}'", trans.Amount,trans.From);
             string error = null;
             MySqlConnection conn = null;
             try
@@ -263,14 +406,15 @@ namespace Ebank.Controllers
 
         internal string TransPush(Trans trans)
         {
-            string sql = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type=1,user_id='{3}'", trans.From,trans.To,trans.Amount,trans.User_Id);
+            string sql_1 = string.Format("insert into consumption_log set account='{0}',to_account='{1}',amount='{2}',type='{4}',user_id='{3}';", trans.From,trans.To,trans.Amount,trans.User_Id,trans.Type);
+            string sql_2 = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type='{4}',user_id='{3}';", trans.From, trans.To, trans.Amount, trans.User_Id, trans.Type);
             string error = null;
             MySqlConnection conn = null;
             try
             {
                 conn = new MySqlConnection(connStr_local);
                 conn.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql_1+sql_2, conn);
                 // 创建DataSet，用于存储数据.
                 DataSet testDataSet = new DataSet();
                 // 执行查询，并将数据导入DataSet.
