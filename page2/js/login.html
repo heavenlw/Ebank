@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>e-Banking Login</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+      <link rel="stylesheet" href="css/lanrenzhijia.css" media="all">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/validation.js"></script>
+	<style>
+	#question{
+		float: right;
+	}
+	</style>
+      <script>
+          jQuery(document).ready(function ($) {
+              $('.theme-poptit .close').click(function () {
+                  $('.theme-popover-mask').fadeOut(100);
+                  $('.theme-popover').slideUp(200);
+              })
+          });
+      </script>
+  </head>
+  <body>
+  	<div class="row">
+  		<div class="col-md-1"></div>
+  		<div class="col-md-9">
+		  	<table class="table">
+		  		<tr>
+		  			<td>
+		  				<h1 style="color:cornflowerblue">ICE BEAR Personal e-Banking Login</h1>
+		  			</td>
+		  			<td style="vertical-align: bottom;"><a href="register.html">Register</a></td>
+		  		</tr>
+		  		<tr>
+		  			<td></td><td></td>
+		  		</tr>
+		  	</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-7">
+			<div class="row">
+				<form class="form-horizontal">
+					<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-3 control-label">User Name</label>
+						    <div class="col-md-6">
+						      <input id="name" type="text" class="form-control">
+                                <script>
+                                    $('#name').change(function () {
+                                        var name = $("#name").val();
+                                        $.ajax({
+                                            type: "get",
+                                            url: "http://hkbuebank.azurewebsites.net/api/login/getquestion?name=" + name,
+                                            success: function (data) {
+                                                var string_json = JSON.stringify(data);
+                                                var obj = JSON.parse(string_json);
+                                                if (obj == null) {
+                                                    $("#select_ques").empty();
+                                                    return;
+                                                }
+                                                var q_id = obj.Id;
+                                                var q_word = obj.Word;
+
+                                                $("#select_ques").empty();
+                                                $("<option value='" + q_id + "'>" + q_word + "</option>").appendTo("#select_ques");
+                                            }
+                                        });
+                                    });
+</script>
+                            </div>
+						    <div class="col-md-3">
+						      		<a class="btn btn-primary btn-large theme-login" href="javascript:;">Forget the user name?</a>
+						    </div>
+				    	</div>
+				  </div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Password</label>
+						    <div class="col-md-6">
+						      <input  id="password"  type="password" class="form-control">
+						    </div>
+						    <div class="col-md-3">
+						      		<a href="#">Forget the password?</a>
+						    </div>
+						</div>
+					</div>
+				  	<div class="row">
+					 	<div class="form-group">
+						    <label class="col-md-3 control-label">Question</label>
+						    <div class="col-md-6">
+						    	<select id="select_ques" class="form-control">
+										<option>Click here to get question</option>
+								</select>
+						    </div>
+					  	</div>
+				  	</div>
+                   
+				  	<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-3 control-label">Answer</label>
+						    <div class="col-md-6">
+						      <input type="text" class="form-control">
+						    </div>
+						    <div class="col-md-3">
+						      		<a href="#">Forget the answer?</a>
+						    </div>
+					  	</div>
+				  	</div>
+				  	<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-3 control-label">CAPTCHA</label>
+						    <div class="col-md-4">
+						      <input type="text" id="inputcode" class="form-control"/>
+						    </div>
+						    <div class="col-md-2">
+						      <input type="text" class="form-control" id="validcode" disabled>
+					    	</div>
+					  	</div>
+				  	</div>
+					<div class="alert alert-warning alert-dismissible" role="alert" id="spanalert">
+ 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</div>
+					<div class="row">
+					  <div class="form-group">
+					    <div class="col-md-9">
+                            <a class="btn btn-primary btn-large theme-login" href="javascript:;" id="log" style="float:right">Log</a>
+					     <script type="text/javascript">
+                                function Logintxt() {
+                                    $(".theme-popover-mask").fadeIn(100);
+                                    $(".theme-popover").slideDown(200);
+                                };
+                                $(document).ready(function () {
+                                    $("#log").click(function () {
+                                        var user = $("#name").val();
+                                        var passage = $("#password").val();
+                                        $.post("http://hkbuebank.azurewebsites.net/api/login/LoginUser",
+                                                                                                        {
+                                                                                                            Name: user,
+                                                                                                            Password: passage
+                                                                                                        },
+                                                                                                        function (data, status) {
+                                                                                                            if (data == "No this user") {
+                                                                                                                //alert("\nStatus: " + data);
+                                                                                                            }
+                                                                                                            if (data == "Password Error") {
+                                                                                                                //alert("\nStatus: " + "Password Error");
+                                                                                                            }
+                                                                                                            if (data == "Success") {
+                                                                                                                //alert("Success");
+                                                                                                                Logintxt();
+                                                                                                            }
+                                                                                                        });
+                                    }
+                                                                                    )
+                                });
+
+                            </script>
+                            <div id="my_id"></div>
+					    </div>
+				  	</div>
+			  	</div>
+				</form>
+			</div>
+	  </div>
+		<div class="col-md-2">
+		  	<a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Help" id="question"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+		</div>
+	</div>
+	<div class="row">
+  		<div class="col-md-1"></div>
+  		<div class="col-md-2">
+  		</div>
+  		<div class="col-md-7">
+  			<div>
+				<textarea class="form-control" rows="4"></textarea>
+			</div>
+		</div>
+  </div>
+	<div class="row">
+	  <div class="col-md-12">
+	  	<blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</div>
+
+	 <div>
+	 	
+  
+</div>
+ <div class="theme-popover">
+     <div class="theme-poptit">
+          <a href="javascript:;" title="Close"  class="close">×</a>
+        
+          <h3>Please ask the question</h3>
+     </div>
+     <div>
+          
+                <div class="col-md-2">
+                
+                         <strong class="col-md-2">Question:</strong>
+                         <input class="col-md-5" id="question" type="text" name="log" value="lanrenzhijia" size="20"/>
+                   
+                </div>
+                     
+                    <div class="col-md-2">
+                         <strong class="col-md-2">Answer:</strong>
+                         <input class="col-md-5" id ="ans"  type="password" name="pwd" value="***" size="20" />
+                    </div>
+                    <div class="col-md-2">
+                         <button class="col-md-9" id="qus_button">Confirm</button>
+                     </div>
+                
+     </div>
+</div>
+<div class="theme-popover-mask">test</div>
+  </body>
+</html>

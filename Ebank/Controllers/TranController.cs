@@ -18,9 +18,10 @@ namespace Ebank.Controllers
         public string CheckAndChange(Trans trans)
         {
             MysqlHelper mysqlhelper = new MysqlHelper();
-            var status = mysqlhelper.ChecktheAccount(trans);
+            var status = mysqlhelper.ChecktheAccount(ref trans);
             if (status == "success")
             {
+
                 return mysqlhelper.UpdateAccount(trans);
             }
             else
@@ -41,6 +42,8 @@ namespace Ebank.Controllers
                 if (trans.Type == "1")
                 {
                     MysqlHelper mysqlhelper = new MysqlHelper();
+                    trans.Type = mysqlhelper.CheckTheInnerAccount(trans);
+
                     return mysqlhelper.TransPush(trans);
                 }
                 else

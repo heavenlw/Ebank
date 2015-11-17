@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saving account</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+	<style>
+		#intro{
+			margin-top:100px;
+			margin-bottom: 50px;
+		}
+		.act{
+			background-color: lightgray;
+			background-clip: content-box;
+		}
+	</style>
+       <script>
+            function CheckRecord(id) {
+               var expires = null; //"expires=" + d.toUTCString();
+               document.cookie = "sa_detail" + "=" + id + "; " + expires;
+               window.open("details.html");
+           }
+           function CreditDetail(id) {
+               var expires = null;
+               document.cookie = "ca_detail" + "=" + id + "; " + expires;
+               window.open("ca_sr.html");
+           }
+           function getCookie(name) {
+               var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+               if (arr = document.cookie.match(reg))
+                   return unescape(arr[2]);
+               else
+                   return null;
+           }
+           function getSavingAccount() {
+               $.post("http://localhost:53239/api/credit/CheckAccount",
+                                                                                                                                {
+                                                                                                                                    Name: "du",
+                                                                                                                                    Password: "202cb962ac59075b964b07152d234b70"
+                                                                                                                                },
+                                                                                                                                function (data, status) {
+                                                                                                                                    for (var i in data) {
+                                                                                                                                        var acc = data[i];
+
+                                                                                                                                        $("#account_list_1").append("<tr><td>" + acc.Type + "</td><td>" + acc.No + "</td><td>" + acc.A_Credit+" "+acc.Currency + "</td><td><a href='#'>Click here to check your e-statement</a></td><td style='text-align: center;'><a onclick='CreditDetail(" + acc.No + ")'  class='btn btn-info' role='button'>Repayment</a><a onclick=' CheckRecord(" + acc.No + ")'  class='btn btn-info' role='button'>Details</a></td></tr>");
+
+                                                                                                                                    }
+
+                                                                                                                                });
+           }
+           $("document").ready(function () {
+               var cookie = getCookie("user_name");
+               if (cookie == null) {
+                   alert("Please Login！");
+                   getSavingAccount();
+                   //window.location.href = ("login.html");
+
+               }
+               else
+               {
+                   getSavingAccount(); 
+               }
+
+           });
+
+
+      </script>
+  </head>
+  <body>
+  	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Ice Bear</a>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="welcome.html">Home</a></li>
+				    <li><a href="sa_ai.html">Saving Account</a></li>
+					<li class = "active"><a href="#">Credit Card Account<span class="sr-only">(current)</span></a></li>
+					<li><a href="#">Credit Service</a></li>
+					<li><a href="#">Finaicial Management</a></li>
+					<li><a href="#">Self-Service</a></li>
+					<li><a href="#">Customer Management</a></li>
+				</ul>
+                <ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Log out</a><li>
+				</ul>
+
+			</div>
+		</div>
+	</nav>
+	<div class="row" id="intro">
+		<div class="col-md-1"></div>
+		<div class="col-md-2">
+			<table class="table table-bordered">
+	  		<tr>
+			    <th>Credit Account</th>
+				</tr>
+				<tr>
+			    <td class="act">
+			    	<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Account Information
+			    	</a>
+			    </td>
+				</tr>
+				<tr>
+					<td>
+						<a href="ca_sr.html">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Self Repayment
+				    </a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Credit Card Application
+				    </a>
+					</td>
+				</tr>
+			</table>
+	  </div>
+		<div class="col-md-7">
+			<div class="row">
+				<div class="col-md-12">
+					<table  class="table table-bordered table-hover">
+						<thead>
+	  						<tr>
+	  							<th>Card Type</th>
+	  							<th>Account No.</th>
+<th>Available Credit</th>
+	  							<th>E-statement</th>
+	  							<th style="text-align:center">Operation</th>
+	  						</tr>
+						</thead>	
+						<tbody id="account_list_1">
+	  						
+							
+						</tbody>
+					</table>
+  							
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<nav class="navbar navbar-default navbar-fixed-bottom navbar-right" style="height: 15px;">
+	  <div class="container">
+	    <blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</nav>
+
+	 <div>
+	 	
+  
+</div>
+ 
+  </body>
+</html>

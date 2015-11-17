@@ -56,6 +56,15 @@ namespace Ebank.Controllers
             return status;
 
         }
+
+
+        [HttpPost]
+        public string CheckLogin(User user)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+          string status =   mysqlhelper.CheckSession(user);
+            return status;
+        }
         private string GetClientIp(HttpRequestMessage request = null)
         {
             request = request ?? Request;

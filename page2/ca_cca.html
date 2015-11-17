@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Credit Card Account</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/validation.js"></script>
+         <script src="js/md918.js"></script>
+         		<script type="text/javascript" src="js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="js/locales/bootstrap-datetimepicker.uk.js" charset="UTF-8"></script>
+	<style>
+		#intro{
+			margin-top:100px;
+			margin-bottom: 50px;
+		}
+		.act{
+			background-color: lightgray;
+			background-clip: content-box;
+		}
+	</style>
+  </head>
+  <body>
+  	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Ice Bear</a>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="welcome.html">Home</a></li>
+				  	<li><a href="#">Saving Account</a></li>
+					<li class="active"><a href="ca_ai.html">Credit Card Account<span class="sr-only">(current)</span></a></li>
+					<li><a href="#">Credit Service</a></li>
+					<li><a href="#">Finaicial Management</a></li>
+					<li><a href="#">Self-Service</a></li>
+					<li><a href="#">Customer Management</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Log out</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="row" id="intro">
+		<div class="col-md-1"></div>
+		<div class="col-md-2">
+			<table class="table table-bordered">
+	  		<tr>
+			    <th>Credit Account</th>
+				</tr>
+				<tr>
+			    	<td>
+				    	<a href="ca_ai.html">
+					    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+					    	Account Information
+				    	</a>
+			    	</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="ca_sr.html">
+					    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+					    	Self Repayment
+				    	</a>
+					</td>
+				</tr>
+				<tr>
+					<td class="act">
+						<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Credit Card Application
+				    </a>
+					</td>
+				</tr>
+			</table>
+	  	</div>
+		<div class="col-md-7">
+			<div class="row">
+				<div class="col-md-12">
+                    <h1 style="color:gray;text-align: center;">
+                        <u>Credit Card Application</u>
+                    </h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h3 style="color:cornflowerblue"><u>Step 1:Please fill in the Application Form</u></h3>
+				</div>
+			</div>
+			<form class="form-horizontal">
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table">
+						<tr>
+							<th style="text-align: center;" colspan="2"><label>Application Form</label></th>
+						</tr>
+						<tr>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Account No.</label>
+								    <div class="col-md-7">
+								      <input type="text" class="form-control" >
+								    </div>
+						    	</div>
+							</td>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Gender</label>
+								    <div class="col-md-3">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsGender">
+									    		Male
+									    	</label>
+								    	</div>
+								    </div>
+								    <div class="col-md-3">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsGender">
+									    		Female
+									    	</label>
+								    	</div>
+								    </div>
+						    	</div>
+							</td>
+						</tr>
+						<tr>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">ID Type</label>
+								    <div class="col-md-7">
+								      	<select class="form-control">
+                                      		<option></option>
+                                 		</select>
+								    </div>
+						    	</div>
+							</td>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">ID No.</label>
+								    <div class="col-md-7">
+								      	<input type="text" class="form-control" >
+								    </div>
+						    	</div>
+							</td>
+						</tr>
+						<tr>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Birth Date</label>
+								    <div class="col-md-7">
+								      	<div class="controls input-append date form_date" data-date="" data-date-format="dd MM yyyy" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+		    							<input id="start_day" size="16" type="text" class="form-control" value="" readonly>
+		    							<span class="add-on"><i class="icon-th"></i></span>
+										</div>
+								    </div>
+						    	</div>
+							</td>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Education Level</label>
+								    <div class="col-md-7">
+								      	<input type="text" class="form-control" >
+								    </div>
+						    	</div>
+							</td>
+						</tr>
+						<tr>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Marital Status</label>
+								    <div class="col-md-3">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsMS">
+									    		Married
+									    	</label>
+								    	</div>
+								    </div>
+								    <div class="col-md-3">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsMS">
+									    		Single
+									    	</label>
+								    	</div>
+								    </div>
+						    	</div>
+							</td>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Residential Status</label>
+								    <div class="col-md-7">
+								      	<select class="form-control">
+                                      		<option>Apartment</option>
+                                 		</select>
+								    </div>
+						    	</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<div class="form-group">
+								    <label class="col-md-3 control-label">Residential Address</label>
+								    <div class="col-md-9">
+								      	<input type="text" class="form-control" >
+								    </div>
+						    	</div>
+							</td>
+						</tr>
+						<tr>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-5 control-label">Company</label>
+								    <div class="col-md-7">
+								      <input type="text" class="form-control" >
+								    </div>
+						    	</div>
+							</td>
+							<td width="50%">
+								<div class="form-group">
+								    <label class="col-md-4 control-label">Salary</label>
+								    <div class="col-md-2">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsSalary">
+									    		≤8000
+									    	</label>
+								    	</div>
+								    </div>
+								    <div class="col-md-3">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsSalary">
+									    		8000~20000
+									    	</label>
+								    	</div>
+								    </div>
+								    <div class="col-md-2">
+								    	<div class="radio">
+									    	<label>
+									      		<input type="radio" name="optionsSalary">
+									    		≥20000
+									    	</label>
+								    	</div>
+								    </div>
+						    	</div>
+							</td>
+						</tr>
+					</table>
+				
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h3 style="color:cornflowerblue"><u>Step 2:Please read the <a href="#" style="color:gray">T&amp;C</a></u></h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h3 style="color:cornflowerblue"><u>Step 3:I've already read the T&amp;C</u></h3>
+					<div class="radio">
+				    	<label>
+				      		<input type="radio">
+				    		I accept it.
+				    	</label>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+			  	<div class="form-group">
+				    <div class="col-md-12">
+				      <button type="button" style="float:right" class="btn btn-primary">Submit</button>
+				    </div>
+			  	</div>
+			</div>
+			</form>
+		</div>
+	</div>
+	<nav class="navbar navbar-default navbar-fixed-bottom navbar-right" style="height: 15px;">
+	  <div class="container">
+	    <blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</nav>
+
+       	<script type="text/javascript">
+	$('.form_date').datetimepicker({
+        language:  'en',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		forceParse: 0
+    });
+	</script>
+  </body>
+</html>

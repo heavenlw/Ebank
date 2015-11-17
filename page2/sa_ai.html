@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saving account</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+      
+	<style>
+		#intro{
+			margin-top:100px;
+			margin-bottom: 20px;
+		}
+		#question{
+			float:right;
+		}
+		.act{
+			background-color: lightgray;
+			background-clip: content-box;
+		}
+     		.font{
+			font-size: 5px;
+		}
+	</style>
+       <script>
+           function showbalance(id, balance) {
+               var findid = "td#" + id;
+               $(findid).text(balance);
+               //$(findid).html(balance);
+           }
+           function CheckRecord(id) {
+               var expires = null; //"expires=" + d.toUTCString();
+               document.cookie = "sa_detail" + "=" + id + "; " + expires;
+               window.open("details.html");
+           }
+
+           function SetCommon(id) {
+               $.post("http://localhost:53239/api/saving/SetCommon",
+                                                                                                                                           {
+                                                                                                                                               Account_Id: id
+                                                                                                                                           },
+                                                                                                                                           function (data, status) {
+                                                                                                                                               alert(data);
+                                                                                                                                               return;
+                                                                                                                                           });
+           }
+
+           function getCookie(name) {
+               var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+               if (arr = document.cookie.match(reg))
+                   return unescape(arr[2]);
+               else
+                   return null;
+           }
+           function getSavingAccount() {
+               $.post("http://localhost:53239/api/saving/CheckAccount",
+                                                                                                                                           {
+                                                                                                                                               Name: "du",
+                                                                                                                                               Password: "202cb962ac59075b964b07152d234b70"
+                                                                                                                                           },
+                                                                                                                                           function (data, status) {
+                                                                                                                                               for (var i in data) {
+                                                                                                                                                   var acc = data[i];
+                                                                                                                                                   if (acc.Common_use == 1) {
+                                                                                                                                                       $("#account_list_1").append("<tr><td>" + acc.No + "</td><td>" + acc.Branch + "</td><td>" + acc.Open_Date + "</td><td>" + acc.Currency_Id + "</td><td id=" + acc.Account_Id + ">" + "--" + "</td><td>" + acc.Status + "</td><td style='text-align: center;'><a id=" + acc.Account_Id + " onclick='showbalance(this.id," + acc.Balance + ")' class='btn btn-info' role='button'>Balance</a><a onclick='CheckRecord(" + acc.No + ")' class='btn btn-info' role='button''>Details</a></td></tr>");
+                                                                                                                                                   }
+                                                                                                                                                   else {
+                                                                                                                                                       $("#account_list_2").append("<tr><td>" + acc.No + "</td><td>" + acc.Branch + "</td><td>" + acc.Open_Date + "</td><td>" + acc.Currency_Id + "</td><td id=" + acc.Account_Id + ">" + "--" + "</td><td>" + acc.Status + "</td><td style='text-align: center;'><a id=" + acc.Account_Id + " onclick='showbalance(this.id," + acc.Balance + ")' class='btn btn-info' role='button'>Balance</a><a onclick='CheckRecord(" + acc.No + ")' class='btn btn-info' role='button''>Details</a></td><td style='text-align: center;'><a onclick='SetCommon(" + acc.Account_Id + ")'  class='btn btn-info' role='button' style='margin: 0 auto; width: 60%;'>Set</a></td></tr>");
+                                                                                                                                                   }
+                                                                                                                                               }
+
+                                                                                                                                           });
+           }
+           $("document").ready(function () {
+               var cookie = getCookie("cname");
+               if (cookie == null) {
+                   alert("Please Login！");
+                   getSavingAccount();
+                   //window.location.href = ("login.html");
+
+               }
+
+           });
+
+
+      </script>
+  </head>
+  <body>
+  	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Ice Bear</a>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="welcome.html">Home</a></li>
+				    <li class = "active"><a href="#">Saving Account<span class="sr-only">(current)</span></a></li>
+					<li><a href="ca_ai.html">Credit Card Account</a></li>
+					<li><a href="#">Credit Service</a></li>
+					<li><a href="#">Finaicial Management</a></li>
+					<li><a href="#">Self-Service</a></li>
+					<li><a href="#">Customer Management</a></li>
+				</ul>
+                <ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Log out</a><li>
+				</ul>
+
+			</div>
+		</div>
+	</nav>
+	<div class="row" id="intro">
+		<div class="col-md-1"></div>
+		<div class="col-md-2">
+			<table class="table table-bordered">
+	  		<tr>
+			    <th>Saving account</th>
+				</tr>
+				<tr>
+			    <td class="act">
+			    	<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Account Information
+			    	</a>
+			    </td>
+				</tr>
+				<tr>
+					<td>
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+							<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+						  Transfer
+						</a>
+					<div class="collapse" id="collapseExample">
+						<table class="table">
+							<tr>
+								<td>
+									<a href="sa_ct.html">
+					    		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+					    		Current Transfer
+				    			</a>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="sa_or.html">
+					    		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+					    		Overseas Remittance
+				    			</a>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="sa_tr.html">
+					    		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+					    		Transfer Record
+				    			</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	
+				    	Business Reservation
+				    </a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Funtion Introduction
+				    </a>
+					</td>
+				</tr>
+			</table>
+	  </div>
+		<div class="col-md-7">
+			<div class="row">
+				<div class="col-md-3">
+					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+					<label>Quick Search</label>
+				</div>
+				<label class="col-md-2">Sub-branch</label>
+				<div class="col-md-3">
+					<select class="form-control">
+							 <option>1</option>
+							 <option>2</option>
+							 <option>3</option>
+					</select>
+				</div>
+				<label class="col-md-2">Open Date</label>
+				<div class="col-md-2">
+					<select class="form-control">
+							 <option>1</option>
+							 <option>2</option>
+							 <option>3</option>
+					</select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+				<hr style="height:2px;border:none;border-top:2px solid gainsboro;"  />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table">
+  						<tr>
+  							<th>
+  								Common Accounts
+  							</th>
+  						</tr>
+  						<tr>
+  							<td>
+  								<table  class="table table-bordered table-hover">
+		  							<thead>
+				  						<tr>
+				  							<td>Card No.</td>
+				  							<td>Sub-branch</td>
+				  							<td>Open Date</td>
+				  							<td>Currency</td>
+                                              <td>Balance</td>
+				  							<td>Status</td>
+				  							<td style="text-align:center">Operation</td>
+				  						</tr>
+		  							</thead>	
+		  							<tbody id="account_list_1">
+				  						
+		  								
+		  							</tbody>
+									</table>
+  							</td>
+  						</tr>
+  				</table>		
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table">
+  						<tr>
+  							<th>
+  								All Accounts
+  							</th>
+  						</tr>
+  						<tr>
+  							<td>
+  								<table  class="table table-bordered table-hover font">
+		  							<tbody id="account_list_2">
+				  						<tr>
+				  							<td>Card No.</td>
+				  							<td>Sub-branch</td>
+				  							<td>Open Date</td>
+				  							<td>Currency</td>
+                                              <td>Balance</td>
+				  							<td>Status</td>
+				  							<td style="text-align:center">Operation</td>
+                                              <td>Set As Common Account</td>
+				  						</tr>
+		  								
+		  								
+		  							</tbody>
+									</table>
+  							</td>
+  						</tr>
+  				</table>		
+				</div>
+			</div>
+			
+			
+		</div>
+	</div>
+	<div class="row">
+	  <div class="col-md-12">
+	  	<blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</div>
+
+	 <div>
+	 	
+  
+</div>
+ 
+  </body>
+</html>

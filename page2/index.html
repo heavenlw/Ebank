@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+	<style>
+		#intro{
+			margin-top:20px;
+			margin-bottom: 20px;
+		}
+		#p{
+			width: 100%;
+		}
+		#question{
+			text-align:right;
+		}
+		#info{
+			
+			text-align:center;
+			padding-top: 15px;
+		}
+		#ver{
+			text-align: right;
+			vertical-align: middle;
+			margin-top: 50px;
+		}
+		.row{
+			margin-top: 34px;
+		}
+		</style>
+		<script type="text/javascript">
+      $("document").ready(function () {
+          $("#1").change(function change() {
+              var u = $(this).parents().find("input[aria-describedby='sizing-addon1']").val();
+              $(this).parents().find("input[aria-describedby='sizing-addon2']").val(u * 7.7498);
+          });
+          $("#-1").change(function change() {
+              var k = $(this).parents().find("input[aria-describedby='sizing-addon2']").val();
+              $(this).parents().find("input[aria-describedby='sizing-addon1']").val(k / 7.7498);
+          });
+          var name = getCookie("name");
+          
+          $("#login").text(name);
+      })
+		</script>
+  </head>
+  <body>
+  	<div class="row">
+  		<div class="col-md-1">
+          <button title="Try_Post" id="post_button">Here</button>
+              <script>
+                  $(document).ready(function () {
+                      $("button").click(function () {
+                          $.post("http://hkbuebank.azurewebsites.net/api/signup/createuser",
+                                                          {
+                                                              Name: "Donald Duck",
+                                                              Password: "Duckburg"
+                                                          },
+                                                          function (data, status) {
+                                                              alert("\nStatus: " + status);
+                                                              //$("#login").text("awol_law");
+                                                              var exdate = new Date();
+                                                              setCookie("name", "awol", 0);
+                                                              alert(getCookie("name"));
+                                                          });
+                      });
+                  });
+                  function setCookie(cname, cvalue, exdays) 
+                  {
+                      var d = new Date();
+                      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+                      var expires = null;  
+                      //"expires=" + d.toUTCString();
+                      document.cookie = cname + "=" + cvalue + "; " + expires;
+                  }
+                  function getCookie(cname) {
+                      var name = cname + "=";
+                      var ca = document.cookie.split(';');
+                      for (var i = 0; i < ca.length; i++) {
+                          var c = ca[i];
+                          while (c.charAt(0) == ' ') c = c.substring(1);
+                          if (c.indexOf(name) != -1) return c.substring(name.length, c.length);
+                      }
+                      return "";
+                  }
+</script>
+          </div>
+  		<div class="col-md-7">
+				<img src="img/logo.png" id="logo"/>
+		</div>
+		  <div class="col-md-2" id="ver">
+		  	<a href="#">简体</a>\
+		  	<a href="#">繁體</a>\
+		  	<a href="#">English</a>
+		  </div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-1"></div>
+	  	<div class="col-md-2">
+	  		<table class="table table-bordered">
+	  			<tr>
+			    	<td>
+			    		<table>
+			    			<tr>
+                               
+			    				<td style="width:80%" id="login">Login
+                                <p id="test" title="123456">....</p>
+                                </td>
+			    				<td><a href="register.html">Register</a></td>
+			    			</tr>
+			    		</table>
+			    	</td>
+				</tr>
+				<tr>
+				    <td>
+				    	<a href="login.html">
+					    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+					    	Personal e-Banking
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+				    <td>
+				    	<a href="#">
+					    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+					    	Business e-Banking
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+				    <td>
+				    	<a href="#">
+					    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+					    	VIP e-Banking
+				    	</a>
+				    </td>
+				</tr>
+			</table>
+	  	</div>
+	  	<div class="col-md-1"></div>
+	  	<div class="col-md-6">
+		  	<table class="table table-bordered" id="news_table">
+		  		<tr>
+				    <th>News</th>
+				</tr>
+			</table>
+		</div>
+        <script type="text/javascript">
+            $.ajax({
+                type: "get",
+                //dataType: "json",
+                 //contentType: "application/json;charset=utf-8",
+                url: "http://hkbuebank.azurewebsites.net/api/Mainpage/getnews",
+                success: function (data) {
+                    //var test = JSON.Stringify(data[0].Summary);
+                    //alert(test);
+                    var string_json = JSON.stringify(data);
+                    var obj = JSON.parse(string_json);
+                    for (var i in obj) {
+                        var d = obj[i];
+                       
+                        $('#news_table').append('<tr><td><a href='+d.Url+'\'>'+ d.Title+'</a></td></tr>');
+                    }
+
+
+                }
+            });
+
+</script>
+	</div>
+	<div class="row">
+		<div class="col-md-1"></div>
+	  	<div class="col-md-2">
+	  		<table class="table table-bordered">
+	  			<tr>
+			    	<th>Exchange Rate</th>
+				</tr>
+				<tr>
+				    <td>
+				    	<table>
+							<tr>
+								<td style="width:95%">
+									<table>
+										<tr>
+											<td>
+												<div class="input-group">
+			  									<span class="input-group-addon" id="sizing-addon2">USD</span>
+			  									<input type="text" class="form-control" placeholder="1" aria-describedby="sizing-addon1" id="1">
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div class="input-group">
+			  									<span class="input-group-addon" id="sizing-addon2">HKD</span>
+			  									<input type="text" class="form-control" placeholder="7.7498" aria-describedby="sizing-addon2" id="-1">
+												</div>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td style="vertical-align:middle; text-align:center;width:5%;" id="rev">
+									<span class="glyphicon glyphicon-refresh" aria-hidden="true" ></span>
+								</td>
+							</tr>
+						</table>
+				    </td>
+				</tr>
+			</table>
+	  	</div>
+	  	<div class="col-md-1"></div>
+	  	<div class="col-md-6">
+		  	<table class="table table-bordered">
+		  		<tr>
+				    <th>About Us</th>
+				</tr>
+				<tr height="75">
+				    <td>bbbbbbbbbbbbbbbbbbbbbbbbb</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="row">
+	  <div class="col-md-12">
+	  	<blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</div>
+
+	 <div>
+	 	
+  
+</div>
+ 
+  </body>
+</html>

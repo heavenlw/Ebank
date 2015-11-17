@@ -24,9 +24,12 @@ namespace Ebank.Controllers
             Trans trans = new Trans();
             trans.From = repayment.Repay_Account;
             trans.Amount = repayment.Amount;
+            trans.To = repayment.Credit_Account;
+            trans.User_Id = repayment.User_Id;
+            trans.Type = repayment.Type;
            // return "Success";
             MysqlHelper mysqlhelper = new MysqlHelper();
-            var status = mysqlhelper.ChecktheAccount(trans);
+            var status = mysqlhelper.ChecktheAccount(ref trans);
             if (status == "success")
             {
                 mysqlhelper.PushToRepayLog(repayment);
@@ -36,6 +39,14 @@ namespace Ebank.Controllers
             {
                 return status;
             }
+        }
+        [HttpPost]
+        public Bill CheckBill([FromBody]Bill account)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            Bill bill = mysqlhelper.GetBill(account);
+
+            return bill;
         }
     }
 }

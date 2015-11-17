@@ -72,7 +72,7 @@ namespace Ebank.Controllers
         }
       
        
-        private string GetClientIp(HttpRequestMessage request = null)
+        public string GetClientIp(HttpRequestMessage request = null)
         {
             request = request ?? Request;
 

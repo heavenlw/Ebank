@@ -29,12 +29,17 @@ namespace Ebank.Controllers
         public string GetHisList([FromBody]History history)
         {
             var html = "";
+            if (history.Start_Date.Year == 1 || history.End_Date.Year == 1||history.Start_Date<DateTime.Now.AddMonths(-3))
+            {
+                history.Start_Date = DateTime.Now.AddMonths(-3);
+                history.End_Date = DateTime.Now;
+            }
             MysqlHelper mysqlhelper = new MysqlHelper();
            List<History> his_list =  mysqlhelper.GetHistory(history);
             foreach (History his in his_list)
             {
                
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",his.Type,his.From,his.To,his.Amount,his.InsertTime);
+                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",his.Type,his.From,his.To,his.Amount+" "+his.Currency,his.InsertTime);
               
             }
             return html;
@@ -44,6 +49,11 @@ namespace Ebank.Controllers
         public string GetOneHisList([FromBody]History history)
         {
             var html = "";
+            if (history.Start_Date.Year == 1 || history.End_Date.Year == 1 || history.Start_Date < DateTime.Now.AddMonths(-3))
+            {
+                history.Start_Date = DateTime.Now.AddMonths(-3);
+                history.End_Date = DateTime.Now;
+            }
             MysqlHelper mysqlhelper = new MysqlHelper();
             List<History> his_list = mysqlhelper.GetAccountHistory(history);
             foreach (History his in his_list)
@@ -54,6 +64,16 @@ namespace Ebank.Controllers
             }
             return html;
 
+        }
+
+        [HttpPost]
+        public string SetCommon(Saving saving)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+            var status = mysqlhelper.SetCommon(saving);
+            return status;
+           
+           
         }
     }
 }

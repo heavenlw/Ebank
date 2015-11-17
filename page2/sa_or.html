@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saving account</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/validation.js"></script>
+   		<script src="js/md918.js"></script>
+		<style>
+		.theme-popover-mask {
+			z-index: 9998;
+			position:fixed;
+			top:0;
+			left:0;
+			width:100%;
+			height:100%;
+			background:#000;
+			opacity:0.4;
+			filter:alpha(opacity=40);
+			display:none
+		}
+		.theme-popover {
+			z-index:9999;
+			position:fixed;
+			top:50%;
+			left:50%;
+			width:500px;
+			height:340px;
+			margin:-180px 0 0 -330px;
+			border-radius:5px;
+			border:solid 2px #666;
+			background-color:#fff;
+			display:none;
+			box-shadow: 0 0 10px #666;
+		}
+		.theme-poptit {
+			border-bottom:1px solid #ddd;
+			padding:12px;
+			position: relative;
+		}
+		.theme-popbod {
+			padding:60px 15px;
+			color:#444;
+			height: 148px;
+		}
+		.theme-signin {
+			margin: -50px -20px -50px 15px;
+			text-align:left;
+			font-size: 14px;
+		}
+		#intro{
+			margin-top:100px;
+			margin-bottom: 20px;
+		}
+		#question{
+			float:right;
+		}
+		#spanalert {
+		position: relative;
+		margin: auto;
+		top: -80px;
+		width: 500px;
+		display: none;
+		clear: both;
+		background-color: #F33 !important;
+		border: none;
+		}
+		
+		
+
+		.myclose {
+		position: relative;
+		top: -2px;
+		right: -10px;
+		line-height: 18px;
+		float: right;
+		font-size: 20px;
+		font-weight: bold;
+		line-height: 18px;
+		color: black;
+		text-shadow: 0 1px 0 white;
+		opacity: 0.2;
+		cursor: pointer;
+		}
+		#dialeft{
+			margin:5px
+		}
+		.act{
+			background-color: lightgray;
+			background-clip: content-box;
+		}
+	</style>
+      <script>
+          var succ;
+
+          function Transpass() {
+              $(".theme-popover-mask").fadeIn(100);
+              $(".theme-popover").slideDown(200);
+          };
+          function GetCurrency(account) {
+              return "1";
+          }
+          $(document).ready(function () {
+              function Swift() {
+                  $.post("http://localhost:53239/api/tran/Swift", {
+                      Swift_Code: $('#swift_code').val(),
+                      Payee_Address: $('#de_address').val(),
+                      Payee_Name: $("#de_name").val(),
+                      Payee_Account_Num: $('#de_account').val(),
+                      Payee_Account_Bank: $('#bank_name').val(),
+                      Payee_Account_Address: $('#bank_address').val(),
+                      Payer_Account_Num: $('#saving_account').val(),
+                      Payer_Name: $('#payer_name').val(),
+                      Payer_Hk_Id: $('#payer_num').val(),
+                      Payer_Amount: $('#trans_amount').val(),
+                      Payer_Currency: GetCurrency($('#saving_account').val()),
+                      User_Id: 6
+                  },
+
+                                                                                                                                              function (data, status) {
+
+                                                                                                                                                  alert(data);
+
+                                                                                                                                              });
+              };
+
+              var status;
+
+              $("#check_password").click(function () {
+
+                  var succ;
+                  var q = $("#password").val();
+                  $.post("http://localhost:53239/api/tran/checkpassword",
+                                                                                                                                                              {
+                                                                                                                                                                  Id: $('#saving_account').val(),
+                                                                                                                                                                  password: $.md5(q)
+
+
+
+                                                                                                                                                              },
+
+                                                                                                                                                              function (data, status) {
+                                                                                                                                                                  if (data == "Success") {
+                                                                                                                                                                      Swift();
+                                                                                                                                                                      return;
+                                                                                                                                                                  }
+                                                                                                                                                                  else {
+                                                                                                                                                                      alert(data);
+                                                                                                                                                                      return;
+                                                                                                                                                                  }
+
+                                                                                                                                                              });
+
+              });
+              $.post("http://localhost:53239/api/saving/checkaccountById", {
+                  Id: "6"
+
+              },
+                   function (data, status) {
+                       var string_json = JSON.stringify(data);
+                       var obj = JSON.parse(string_json);
+                       if (obj == null) {
+                           $("#saving_account").empty();
+                           return;
+                       }
+                       else {
+                           for (var i in obj) {
+                               var q_id = obj[i].No;
+                               var q_word = obj[i].No;
+                               $("#saving_account").append("<option value='" + q_id + "'>" + q_word + "</option>");
+                               //$("<option value='" + q_id + "'>" + q_word + "</option>").appendTo("#saving_account");
+                           }
+                       }
+                   });
+              $.post("http://localhost:53239/api/userinfo/getinfo", {
+                  Id: "6"
+
+              },
+                   function (data, status) {
+                       var string_json = JSON.stringify(data);
+                       var obj = JSON.parse(string_json);
+                       if (obj == null) {
+
+                           return;
+                       }
+                       else {
+                           $("#payer_name").val(obj.RealName);
+                           $("#payer_address").val(obj.Address);
+                           $("#payer_num").val(obj.Hk_Id);
+                       }
+
+                   });
+              function CheckTrans() {
+                  var succ;
+
+                  $.ajax({
+                      type: "get",
+                      url: "http://localhost:53239/api/Tran/CheckSwift?code=" + $('#swift_code').val(),
+                      success: function (data) {
+                          var string_json = JSON.stringify(data);
+                          var obj = JSON.parse(string_json);
+                          if (obj == null) {
+                              alert("Swift code you entered is incorrect, please re-enter");
+                              succ = "error";
+                          }
+                          else {
+                              $("#bank_name").val(obj.Bank_Name);
+                              $("#bank_address").val(obj.Bank_Address);
+                              $("#swift_code").val(obj.Code);
+                              succ = "Success";
+                          }
+
+                      }
+
+                  });
+                  return succ;
+              }
+              function status1() {
+                  $("#de_account").attr("readonly", "readonly");
+                  $("#de_name").attr("readonly", "readonly");
+                  $("#swift_code").attr("readonly", "readonly");
+                  $('#inputcode').removeAttr("readonly");
+                  $('#trans_amount').removeAttr("readonly");
+                  $('#message_code').removeAttr("readonly");
+                  //$('input[name=username]').removeAttr("readonly");
+                  $('#Check_trans').text("Change Recipient Account");
+                  $("#trans").removeAttr('disabled');
+              }
+              function status2() {
+                  $("#de_account").removeAttr("readonly");
+                  $("#de_name").removeAttr("readonly");
+                  $('').removeAttr("readonly");
+                  $('#inputcode').attr("readonly", "readonly");
+                  $('#trans_amount').attr("readonly", "readonly");
+                  $('#message_code').attr("readonly", "readonly");
+                  $('#Check_trans').text("Check");
+                  $('#bank_address').val("");
+                  $('#bank_name').val("");
+                  $("#trans").attr('disabled', true);
+                  $("#swift_code").removeAttr("readonly");
+              }
+
+              $('#Check_trans').click(function () {
+                  if ($('#Check_trans').text() == "Check") {
+                      var check_status = CheckTrans();
+                      if (check_status == "Success") {
+                          status1();
+                      }
+                  }
+                  else {
+
+                      status2();
+
+                  }
+
+              });
+
+
+              $("#trans").click(function () {
+                  var check = $("#trans").attr("disabled");
+                  if (check == "disabled" || check == "true") {
+                      return;
+                  }
+                  $.post("http://localhost:53239/api/tran/checkbalance", {
+                      User_Id: $('#de_account').val(),
+                      No: $('#saving_account').val(),
+                      Amount: $('#trans_amount').val(),
+                      Message_Code: $('#message_code').val()
+
+                  },
+
+                                                                                                                                                              function (data, status) {
+                                                                                                                                                                  if (data == "Success") {
+                                                                                                                                                                      succ = data;
+                                                                                                                                                                      $("#recipient_account").val($("#de_account").val());
+                                                                                                                                                                      $("#recipient_name").val($("#de_name").val());
+                                                                                                                                                                      $("#transfer_amount").val($("#trans_amount").val());
+
+                                                                                                                                                                      Transpass();
+
+                                                                                                                                                                  }
+
+                                                                                                                                                              });
+              });
+          });
+      </script>
+  </head>
+  <body>
+  	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Ice Bear</a>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="welcome.html">Home</a></li>
+				  	<li class="active"><a href="#">Saving Account<span class="sr-only">(current)</span></a></li>
+					<li><a href="#">Credit Card Account</a></li>
+					<li><a href="#">Credit Service</a></li>
+					<li><a href="#">Finaicial Management</a></li>
+					<li><a href="#">Self-Service</a></li>
+					<li><a href="#">Customer Management</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Log out</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="row" id="intro">
+		<div class="col-md-1"></div>
+		<div class="col-md-2">
+			<table class="table table-bordered">
+	  		<tr>
+			    <th>Saving account</th>
+				</tr>
+				<tr>
+			    <td>
+			    	<a href="sa_ai.html">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Account Information
+			    	</a>
+			    </td>
+				</tr>
+				<tr>
+					<td>
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+							<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+						  Transfer
+						</a>
+					<div class="collapse in" id="collapseExample">
+						<table class="table">
+							<tr>
+								<td>
+									<a href="sa_ct.html">
+					    		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+					    		Current Transfer
+				    			</a>
+								</td>
+							</tr>
+							<tr>
+								<td class="act">
+									<a href="#">
+					    		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+					    		Overseas Remittance
+				    			</a>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="sa_tr.html">
+					    		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+					    		Transfer Record
+				    			</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Business Reservation
+				    </a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="#">
+				    	<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+				    	Funtion Introduction
+				    </a>
+					</td>
+				</tr>
+			</table>
+	  </div>
+		<div class="col-md-7">
+			<div class="row">
+				<div class="col-md-12">
+					<h1 style="color:gray;text-align: center;"><u>Overseas Remittance</u></h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h3 style="color:cornflowerblue"><u>Recipient Account Information</u></h3>
+				</div>
+			</div>
+			
+			<div class="row">
+				<form class="form-horizontal">
+					<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-3 control-label">Account No.</label>
+						    <div class="col-md-6">
+						      <input id="de_account" type="text" class="form-control" >
+						    </div>
+				    	</div>
+				 	</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Payee</label>
+						    <div class="col-md-6">
+						      <input id="de_name" type="text" class="form-control" >
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Payee Address</label>
+						    <div class="col-md-6">
+						      <input id="de_address" type="text" class="form-control" placeholder="Street.City.Country">
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Bank Name</label>
+						    <div class="col-md-6">
+						      <input id="bank_name" type="text" class="form-control" readonly="true" >
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Bank Address</label>
+						    <div class="col-md-6">
+						      <input id="bank_address" type="text" class="form-control" placeholder="Street.City.Country" readonly="true">
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">SWIFT CODE</label>
+						    <div class="col-md-4">
+						      <input type="text" class="form-control" id="swift_code">
+						    </div>
+						</div>
+					</div>
+                   <div class="row">
+				  	<div class="form-group">
+					    <div class="col-md-9">
+					      <button type="button" id="Check_trans" class="btn btn-warning" style="float:right">Check</button>
+					    </div>
+				  	</div>
+				  </div>
+				</form> 
+			</div>
+           
+			<div class="row">
+				<div class="col-md-10">
+					<hr style="height:2px;border:none;border-top:2px solid gainsboro;"  />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h3 style="color:cornflowerblue"><u>Remitter Information</u></h3>
+				</div>
+			</div>
+			<div class="row">
+				<form class="form-horizontal">
+					<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-3 control-label">Transfer Account</label>
+						    <div class="col-md-6">
+						      <select id ="saving_account" class="form-control">
+									 	<option value="0">Select Your Saving Account</option>
+							  </select>
+						    </div>
+				    	</div>
+				  </div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Payer</label>
+						    <div class="col-md-6">
+						      <input readonly type="text" class="form-control" id="payer_name">
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">ID No.</label>
+						    <div class="col-md-6">
+						      <input readonly type="text" class="form-control" id="payer_num">
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Address</label>
+						    <div class="col-md-6">
+						      <input readonly type="text" class="form-control" id="payer_address">
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Message Code</label>
+						    <div class="col-md-4">
+						      <input id="message_code" readonly type="text" class="form-control" >
+						    </div>
+						    <div class="col-md-2">
+						    	<button type="button" class="btn btn-success" style="float: right;">Obtain Message</button>
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-3 control-label">Transfer amount</label>
+						    <div class="col-md-4">
+						      <input id="trans_amount" type="number" min="0" max="5000" readonly class="form-control">
+						    </div>
+                <div class="col-md-2">
+						    	<button class="btn btn-success" style="float: right;" type="button">Check&nbsp;&nbsp;&nbsp;Balance</button>
+						    </div>
+						</div>
+					</div>
+					<div class="row">
+				  	<div class="form-group">
+					    <label class="col-md-3 control-label">CAPTCHA</label>
+					    <div class="col-md-4">
+					      <input  readonly="readonly" type="text" id="inputcode" class="form-control"/>
+					    </div>
+					    <div class="col-md-2">
+					      <input type="text" class="form-control" id="validcode" disabled>
+				    	</div>
+				  	</div>
+				  </div>
+				  <div class="row">
+				  	<div class="form-group">
+					    <div class="col-md-9">
+					      <a type="submit" class="btn btn-primary" id="trans" style="float:right" disabled="true">Submit</a>
+					    </div>
+				  	</div>
+				  </div>
+				</form>
+				<div class="alert alert-error" id="spanalert">
+					<a class="myclose">×</a> <label></label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+	  <div class="col-md-12">
+	  	<blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</div>
+
+	 <div>
+	 	
+  
+</div>
+      <div class="theme-popover">
+     <div class="theme-poptit">
+          <a id="close" href="javascript:;" class="close">×</a>
+         <script>
+             $('#close').click(function () {
+                  $('.theme-popover-mask').fadeOut(100);
+                  $('.theme-popover').slideUp(200);
+              })
+         </script>
+          <h3>Please Confirm And Enter the Password</h3>
+     </div>
+     <div class="theme-popbod dform">
+      <form class="theme-signin form-horizontal">
+      	<div class="row">
+      		<div class="form-group dialef">
+					    <label  class="col-md-4 control-label pull-left" >Recipient Account</label>
+					    <div class="col-sm-6">
+					      <input disabled="disabled" id="recipient_account" class="form-control" style="float:right"></input>
+                        </div>
+      	    </div>
+      		<div class="form-group">
+					    <label  class="col-md-4 control-label">Recipient Name</label>
+					    <div class="col-md-6">
+					      <input disabled="disabled" id="recipient_name" class="form-control" style="float:right"></input>
+                        </div>
+      	</div>
+      		<div class="form-group">
+					    <label  class="col-md-4 control-label">Transfer Amount</label>
+					    <div class="col-md-6">
+					      <input disabled="disabled" id="transfer_amount" class="form-control" style="float:right"></input>
+                        </div>
+      	    </div>
+      		<div class="form-group">
+					    <label class="col-md-4 control-label">Password</label>
+					    <div class="col-md-6">
+					      <input id="password" type="password" class="form-control" placeholder="Please Input Your Password" style="float:right">
+					    </div>
+  			</div>
+					<div class="form-group">
+					    <div class="col-md-6 col-md-offset-8">
+					      <button id="check_password" class="btn btn-info">Confirm</button>
+                  
+
+                           
+					    </div>
+					  </div>
+				</div>	  
+			</form>
+     </div>
+</div>
+      <div class="theme-popover-mask"></div>
+ 
+  </body>
+</html>

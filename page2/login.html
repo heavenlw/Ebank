@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>e-Banking Login</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+       <link rel="stylesheet" href="css/lanrenzhijia.css" media="all">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/validation.js"></script>
+        <script src="js/md918.js"></script>
+		<style>
+		.theme-popover-mask {
+			z-index: 9998;
+			position:fixed;
+			top:0;
+			left:0;
+			width:100%;
+			height:100%;
+			background:#000;
+			opacity:0.4;
+			filter:alpha(opacity=40);
+			display:none
+		}
+		.theme-popover {
+			z-index:9999;
+			position:fixed;
+			top:50%;
+			left:50%;
+			width:500px;
+			height:260px;
+			margin:-180px 0 0 -330px;
+			border-radius:5px;
+			border:solid 2px #666;
+			background-color:#fff;
+			display:none;
+			box-shadow: 0 0 10px #666;
+		}
+		.theme-poptit {
+			border-bottom:1px solid #ddd;
+			padding:12px;
+			position: relative;
+		}
+		.theme-popbod {
+			padding:60px 15px;
+			color:#444;
+			height: 148px;
+		}
+		.theme-signin {
+			margin: -50px -20px -50px 90px;
+			text-align:left;
+			font-size: 14px;
+		}
+		#question{
+			float: right;
+		}
+		#spanalert {
+		position: relative;
+		margin: auto;
+		top: -80px;
+		width: 500px;
+		display: none;
+		clear: both;
+		background-color: #F33 !important;
+		border: none;
+		}
+	
+		.myclose {
+			position: relative;
+			top: -2px;
+			right: -10px;
+			line-height: 18px;
+			float: right;
+			font-size: 20px;
+			font-weight: bold;
+			line-height: 18px;
+			color: black;
+			text-shadow: 0 1px 0 white;
+			opacity: 0.2;
+			cursor: pointer;
+		}
+		</style>
+      <script>
+          $("document").ready(function () {
+              var name_1;
+              function Logintxt() {
+                  $(".theme-popover-mask").fadeIn(100);
+                  $(".theme-popover").slideDown(200);
+              };
+              function setCookie(cname, cvalue, exdays) {
+                  var d = new Date();
+                  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+                  var expires = null; //"expires=" + d.toUTCString();
+                  document.cookie = cname + "=" + cvalue + "; " + expires;
+              };
+              function Question() {
+                  $.ajax({
+                      type: "get",
+                      url: "http://localhost:53239/api/login/getquestion?name=" + name_1,
+                      success: function (data) {
+                          var string_json = JSON.stringify(data);
+                          var obj = JSON.parse(string_json);
+                          if (obj == null) {
+                              $("#select_ques").empty();
+                              return;
+                          }
+                          var q_id = obj.Id;
+                          var q_word = obj.Word;
+                          //document.getElementById("questione").value=q_word; 
+                          $("#question_List").val(q_word);
+
+                      }
+                  });
+              };
+              $("#login").click(function () {
+                  if ($("#name").val() == "") {
+                      $("#spanalert").css("display", "block");
+                      $("#spanalert label").html("Please Input Your User Name");
+                      return;
+                  }
+                  if ($("#password").val() == "") {
+                      $("#spanalert").css("display", "block");
+                      $("#spanalert label").html("Please Input Your Password");
+                      return;
+                  }
+
+                  if ($("#inputcode").val() != $("#validcode").val()) {
+                      $("#spanalert").css("display", "block");
+                      $("#spanalert label").html("CAPTCHA you entered was not correct. Please try again. ");
+                      return false;
+                  }
+                  var user = $("#name").val();
+                  var passage = $.md5($("#password").val());
+                  $.post("http://localhost:53239/api/login/LoginUser",
+                                                                                                                                 {
+                                                                                                                                     Name: user,
+                                                                                                                                     Password: passage
+                                                                                                                                 },
+                                                                                                                                 function (data, status) {
+                                                                                                                                     if (data.Status == "No this user") {
+                                                                                                                                         alert("\nStatus: " + data);
+                                                                                                                                     }
+                                                                                                                                     if (data.Status == "Password Error") {
+                                                                                                                                         alert("\nStatus: " + "Password Error");
+                                                                                                                                     }
+                                                                                                                                     if (data.Status == "Success") {
+                                                                                                                                         //alert("Success");
+                                                                                                                                         name_1 = user;
+                                                                                                                                         Question();
+                                                                                                                                         Logintxt();
+                                                                                                                                     }
+                                                                                                                                 });
+              });
+
+
+
+
+              $("#check_answer").click(function () {
+
+                  var succ;
+                  var answer_q = $("#answer_list").val();
+                  $.post("http://localhost:53239/api/login/checkquestion",
+                                                                                                                                                                    {
+                                                                                                                                                                        Name: name_1,
+                                                                                                                                                                        Question_Answer: $.md5(answer_q)
+                                                                                                                                                                    },
+
+                                                                                                                                                                    function (data, status) {
+                                                                                                                                                                        if (data.Status == "Success") {
+                                                                                                                                                                            succ = data.Status;
+                                                                                                                                                                            if (succ == "Success") {
+                                                                                                                                                                                alert("Login Success");
+                                                                                                                                                                                setCookie("user_name", name_1, 0);
+                                                                                                                                                                                setCookie("user_id", data.Id, 0);
+                                                                                                                                                                                setCookie("session", data.Session, 0);
+                                                                                                                                                                                window.open("welcome.html");
+                                                                                                                                                                                return;
+                                                                                                                                                                            }
+                                                                                                                                                                            else {
+                                                                                                                                                                                alert("Login failed");
+                                                                                                                                                                            }
+                                                                                                                                                                        } 
+                                                                                                                                                                    });
+              });
+          });
+                                                                                                                                                                    </script>
+  </head>
+  <body>
+  	<div class="row">
+  		<div class="col-md-1"></div>
+  		<div class="col-md-9">
+		  	<table class="table">
+		  		<tr>
+		  			<td>
+		  				<h1 style="color:cornflowerblue">ICE BEAR Personal e-Banking Login</h1>
+		  			</td>
+		  			<td style="vertical-align: bottom;"><a href="register.html">Register</a></td>
+		  		</tr>
+		  		<tr>
+		  			<td></td><td></td>
+		  		</tr>
+		  	</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-7">
+			<div class="row">
+				<div class="col-md-12">
+					<table height="100"></table>
+				</div>
+			</div>
+			<div class="row">
+				<form class="form-horizontal">
+					<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-4 control-label">User Name</label>
+						    <div class="col-md-5">
+						      <input type="text" id="name" class="form-control" >
+						
+
+						    </div>
+						    <div class="col-md-3">
+						      		<a href="#">Forget the user name?</a>
+						    </div>
+				    	</div>
+				  </div>
+					<div class="row">
+						<div class="form-group">
+						    <label class="col-md-4 control-label">Password</label>
+						    <div class="col-md-5">
+						      <input type="password" id="password" class="form-control">
+						    </div>
+						    <div class="col-md-3">
+						      		<a href="#">Forget the password?</a>
+						    </div>
+						</div>
+					</div>
+				  	<div class="row">
+					  	<div class="form-group">
+						    <label class="col-md-4 control-label">CAPTCHA</label>
+						    <div class="col-md-3">
+						      <input type="text" id="inputcode" class="form-control"/>
+						    </div>
+						    <div class="col-md-2">
+						      <input type="text" class="form-control" id="validcode" disabled>
+					    	</div>
+					  	</div>
+				  	</div>
+					<div class="row">
+					  <div class="form-group">
+					    <div class="col-md-9">
+					      <a class="btn btn-primary btn-large theme-login" href="javascript:;" id="login" style="float:right">Log</a>
+					    <div class="alert alert-error" id="spanalert">
+					<a class="myclose">×</a> <label></label>
+				</div>
+					    </div>
+				  	</div>
+			  	</div>
+                  
+				 <div class="row">
+					<div class="col-md-12">
+						<table height="100"></table>
+					</div>
+				</div>
+				</form>
+				<div class="alert alert-error" id="spanalert">
+					<a class="myclose">×</a> <label></label>
+				</div>
+			</div>
+	  </div>
+		<div class="col-md-1">
+		  	<a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Help" id="question"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+		</div>
+	</div>
+	<div class="row">
+	  <div class="col-md-12">
+	  	<blockquote class="blockquote-reverse">
+			<footer>
+				<a href="#">Contact with us</a>
+			</footer>
+		</blockquote>
+	  </div>
+	</div>
+<div class="theme-popover">
+     <div class="theme-poptit">
+          <a id="close" href="javascript:;" class="close">×</a>
+         <script>
+             $('#close').click(function () {
+                  $('.theme-popover-mask').fadeOut(100);
+                  $('.theme-popover').slideUp(200);
+              })
+         </script>
+          <h3>Please ask the question</h3>
+     </div>
+     <div class="theme-popbod dform">
+      <form class="theme-signin form-horizontal">
+      	<div class="row">
+      		<div class="form-group">
+					    <label  class="col-md-2 control-label">Question</label>
+					    <div class="col-md-7">
+					      <input disabled="disabled" id="question_List" class="form-control"></input>
+                          
+					    </div>
+					  </div>
+      	</div>
+      	<div class="row">
+      		<div class="form-group">
+					    <label class="col-md-2 control-label">Answer</label>
+					    <div class="col-md-7">
+					      <input id="answer_list" type="text" class="form-control" placeholder="Please answer the question">
+					    </div>
+  					</div>
+      	</div>
+				<div class="row">
+					<div class="form-group">
+					    <div class="col-sm-offset-2 col-sm-10">
+					      <button id="check_answer" class="btn btn-info">Confirm</button>
+                           
+					    </div>
+					  </div>
+				</div>	  
+			</form>
+     </div>
+</div>
+<div class="theme-popover-mask"></div>
+
+ 
+  </body>
+</html>

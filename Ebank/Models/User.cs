@@ -15,6 +15,7 @@
         public string Address { get; internal set; }
 
         public string Session { get; set; }
+       
         
     }
 }

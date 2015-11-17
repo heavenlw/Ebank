@@ -58,6 +58,148 @@ namespace Ebank.Controllers
             return question_list;
         }
 
+        internal string CheckSession(User user)
+        {
+            string sql = string.Format("select * from user where id= '{0}'", user.Id);
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+
+                if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
+                {
+                    if (user.Session == testDataSet.Tables["result_data"].Rows[0].ToString())
+                    {
+                        return "OK";
+                    }
+                    else
+                    {
+                        return "Error";
+                    }
+
+                }
+                else
+                {
+                    return "Error";
+                }
+            }
+            catch (Exception t)
+            {
+                return "Error";
+            }
+
+        }
+
+        internal string CheckTheInnerAccount(Trans trans)
+        {
+            string sql = string.Format("select * from saving_account where card_num = '{0}'", trans.To);
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+
+                if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
+                {
+                    return "1";
+
+                }
+                else
+                {
+                    return "6";
+                }
+            }
+            catch (Exception t)
+            {
+                return "6";
+            }
+         }
+
+        internal string SetCommon(Saving saving)
+        {
+            string sql = string.Format("update saving_account set common_use=1 where id ='{0}'",saving.Account_Id);
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+                return "Success";
+            }
+            catch (Exception t)
+            {
+                return "error";
+            }
+        }
+
+        internal Bill GetBill(Bill account)
+        {
+            Bill bill = new Bill();
+            string sql = string.Format("select * from credit_bill as b,currency as c where b.credit_account_num='{0}' and b.currency_id=c.id order by repayment_deadline desc limit 1", account.Account);
+            DataSet testDataSet = null;
+            MySqlConnection conn = new MySqlConnection(connStr_local);
+            try
+            {
+                conn.Open();
+                // 创建一个适配器
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+            }
+            // 关闭数据库连接.
+            catch (Exception e)
+            {
+                //log4net.ILog log = log4net.LogManager.GetLogger("MyLogger");
+                //log.Debug(e.Message);
+                Console.WriteLine(e.Message);
+                return bill;
+                //Console.ReadLine();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null)
+            {
+                foreach (DataRow testRow in testDataSet.Tables["result_data"].Rows)
+                {
+                    int id = Convert.ToInt32(testRow["id"].ToString());
+                    int remain_repayment = Convert.ToInt32(testRow["remain_repayment"].ToString());
+                    string minimum_repayment = testRow["minimum_repayment"].ToString();
+                    string deadline = testRow["repayment_deadline"].ToString();
+                    string currency_name = testRow["currency_name"].ToString();
+                    bill.Id = id;
+                    bill.Remain_repayment = remain_repayment;
+                    bill.Minimum_repayment = minimum_repayment;
+                    bill.Deadline = deadline;
+                    bill.Currency = currency_name;
+
+                }
+            }
+            return bill;
+        }
+
         public List<Curr> GetCurrency()
         {
             List<Curr> curr_list = new List<Curr>();
@@ -130,14 +272,14 @@ namespace Ebank.Controllers
         internal void PushToRepayLog(Repay repayment)
         {
             string sql_1 = string.Format("insert into repayment_log set bill_id='{0}',amount='{1}',repay_account='{2}',type='{3}';", repayment.Bill_Id,repayment.Amount,repayment.Repay_Account,repayment.Type);
-           
+           string sql_2 = string.Format("update credit_bill set remain_repayment=remain_repayment-{0} where id ='{1}'",repayment.Amount,repayment.Bill_Id);
             string error = null;
             MySqlConnection conn = null;
             try
             {
                 conn = new MySqlConnection(connStr_local);
                 conn.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(sql_1, conn);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql_1+sql_2, conn);
                 // 创建DataSet，用于存储数据.
                 DataSet testDataSet = new DataSet();
                 // 执行查询，并将数据导入DataSet.
@@ -153,7 +295,7 @@ namespace Ebank.Controllers
         internal List<Credit> GetAllCreditAccount(string user_id)
         {
             List<Credit> credit_list = new List<Credit>();
-            string sql = string.Format("select * from credit_account where user_id ='{0}'", user_id);
+            string sql = string.Format("select * from credit_account as ca,currency as c where ca.user_id ='{0}'  and ca.currency_id = c.id", user_id);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -189,7 +331,7 @@ namespace Ebank.Controllers
                     string credit_amount = testRow["credit_amount"].ToString();
                     string branch_id = testRow["branch_id"].ToString();
                     string type = testRow["type"].ToString();
-                    string currency_id = testRow["currency_id"].ToString();
+                    string currency_id = testRow["currency_name"].ToString();
                     string status = testRow["status"].ToString();
                     string a_credit = testRow["available_credit"].ToString();
                     credit_card.Id = Account_Id;
@@ -214,7 +356,7 @@ namespace Ebank.Controllers
         internal List<History> GetAccountHistory(History history)
         {
             List<History> list = new List<History>();
-            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.account='{0}' and l.type=t.id  and l.currency = c.id order by l.date desc", history.Account);
+            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.account='{0}' and l.date<='{1}' and l.date>='{2}' and l.type=t.id  and l.currency = c.id order by l.date desc", history.Account, history.End_Date, history.Start_Date);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -274,7 +416,7 @@ namespace Ebank.Controllers
         internal List<History> GetHistory(History history)
         {
             List<History> list = new List<History>();
-            string sql = string.Format("select * from consumption_log as l,log_type as t where l.user_id='{0}' and l.type=t.id order by l.date desc", history.User_Id);
+            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.user_id='{0}' and l.date<='{1}' and l.date>='{2}' and (l.type=1||l.type=5) and l.type=t.id and l.currency=c.id order by l.date desc", history.User_Id,history.End_Date,history.Start_Date);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -309,7 +451,7 @@ namespace Ebank.Controllers
                     string From = testRow["account"].ToString();
                     string To = testRow["to_account"].ToString();
                     string insert_time = testRow["date"].ToString();
-                    string currency = testRow["currency"].ToString();
+                    string currency = testRow["currency_name"].ToString();
                     string status = testRow["status"].ToString();
                     string amount = testRow["amount"].ToString();
                     string type = testRow["type_name"].ToString();
@@ -318,7 +460,7 @@ namespace Ebank.Controllers
                     one_history.To = To;
                     one_history.InsertTime = insert_time;
                     one_history.Amount = amount;
-                    //one_history.FinishTime = finish_time;
+                    one_history.Currency = currency;
                     one_history.Status = status;
                     one_history.Type = type;
                     list.Add(one_history);
@@ -330,14 +472,26 @@ namespace Ebank.Controllers
 
         internal string UpdateAccount(Trans trans)
         {
-            string sql = string.Format("update saving_account set balance= balance-'{0}' where card_num='{1}'", trans.Amount,trans.From);
+            string sql_1 = string.Format("insert into consumption_log set account='{0}',to_account='{1}',amount='{2}',type='{4}',user_id='{3}', currency='{5}';", trans.From, trans.To, trans.Amount, trans.User_Id, trans.Type,trans.Currency);
+            string sql_2 = string.Format("update saving_account set balance= balance-'{0}' where card_num='{1}';", trans.Amount,trans.From);
+            string sql_3 = string.Format("update credit_account set available_credit= available_credit+{0} where card_num='{1}';", trans.Amount,trans.To);
+            string sql_4 = string.Format("insert into consumption_log set account='{0}',amount='{1}',type='{3}',user_id='{2}', currency='{4}';", trans.To,trans.Amount, trans.User_Id,"8", trans.Currency);
             string error = null;
             MySqlConnection conn = null;
             try
             {
                 conn = new MySqlConnection(connStr_local);
                 conn.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                MySqlDataAdapter adapter = new MySqlDataAdapter();
+                if (trans.Type == "4")
+                {
+
+                    adapter = new MySqlDataAdapter(sql_1 + sql_2 + sql_3+sql_4, conn);
+                }
+                else
+                {
+                    adapter = new MySqlDataAdapter(sql_1+sql_2, conn);
+                }
                 // 创建DataSet，用于存储数据.
                 DataSet testDataSet = new DataSet();
                 // 执行查询，并将数据导入DataSet.
@@ -350,7 +504,7 @@ namespace Ebank.Controllers
             }
         }
 
-        internal string ChecktheAccount(Trans tran)
+        internal string ChecktheAccount(ref Trans tran)
         {
             string sql = string.Format("select * from saving_account where card_num='{0}'", tran.From);
             DataSet testDataSet = null;
@@ -382,6 +536,7 @@ namespace Ebank.Controllers
             {
                 if (Convert.ToInt32(testDataSet.Tables["result_data"].Rows[0]["balance"].ToString())>=Convert.ToInt32(tran.Amount))
                 {
+                    tran.Currency = testDataSet.Tables["result_data"].Rows[0]["currency_id"].ToString();
                     return "success";
                 }
                 else
@@ -477,15 +632,24 @@ namespace Ebank.Controllers
 
         internal string TransPush(Trans trans)
         {
-            string sql_1 = string.Format("insert into consumption_log set account='{0}',to_account='{1}',amount='{2}',type='{4}',user_id='{3}';", trans.From,trans.To,trans.Amount,trans.User_Id,trans.Type);
-            string sql_2 = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type='{4}',user_id='{3}';", trans.From, trans.To, trans.Amount, trans.User_Id, trans.Type);
+            string sql_1 = string.Format("insert into consumption_log set account='{0}',to_account='{1}',amount='{2}',type='{4}',user_id='{3}',currency='{5}';", trans.From,trans.To,trans.Amount,trans.User_Id,trans.Type,trans.Currency);
+           string sql_2 = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type='{4}',user_id='{3}';", trans.From, trans.To, trans.Amount, trans.User_Id, trans.Type);
+            string sql_3 = "";
+            string sql_4 = "";
+            if (trans.Type == "1")
+            {
+                sql_1 = "";
+                sql_2 = string.Format("insert into trans_log set tr_from='{0}',tr_to='{1}',amount='{2}',type='{4}',user_id='{3}',status='2';", trans.From, trans.To, trans.Amount, trans.User_Id, trans.Type);
+                sql_3 = string.Format("update saving_account set balance = balance+{0} where card_num='{1}';",trans.Amount,trans.To);
+                sql_4 = string.Format("insert into consumption_log set account='{0}',amount='{1}',type='{3}',user_id='{2}',currency='{4}',from_account='{5}';", trans.To, trans.Amount, trans.User_Id, "2", trans.Currency,trans.From);
+            }
             string error = null;
             MySqlConnection conn = null;
             try
             {
                 conn = new MySqlConnection(connStr_local);
                 conn.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(sql_1+sql_2, conn);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql_1+sql_2+sql_3+sql_4, conn);
                 // 创建DataSet，用于存储数据.
                 DataSet testDataSet = new DataSet();
                 // 执行查询，并将数据导入DataSet.
