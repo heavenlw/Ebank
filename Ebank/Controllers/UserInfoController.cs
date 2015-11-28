@@ -17,5 +17,12 @@ namespace Ebank.Controllers
             user.Hk_Id = "154***02";
             return user;
         }
+        [HttpPost]
+        public string UpdatePassword(User user)
+        {
+            MysqlHelper mysqlhelper = new MysqlHelper();
+           string status =  mysqlhelper.UpdatePassword(user);
+            return status;
+        }
     }
 }

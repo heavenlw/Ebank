@@ -222,7 +222,12 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\Bill.cs" />
+    <Compile Include="Controllers\BillController.cs" />
+    <Compile Include="Controllers\FinController.cs" />
+    <Compile Include="Models\Stock.cs" />
+    <Compile Include="Controllers\stockController.cs" />
+    <Compile Include="Models\SelfBill.cs" />
+    <Compile Include="Models\Bill.cs" />
     <Compile Include="Models\Curr.cs" />
     <Compile Include="Models\Repay.cs" />
     <Compile Include="Models\Credit.cs" />

@@ -14,7 +14,7 @@ namespace Ebank.Controllers
         {
             
             MysqlHelper mysqlhelper = new MysqlHelper();
-            var user_id = mysqlhelper.SearchID(user.Name, user.Password);
+            var user_id = mysqlhelper.SearchID(user.Name, user.Session);
            return  mysqlhelper.GetAllSavingAccount(user_id);
         }
         [HttpPost]
@@ -28,18 +28,21 @@ namespace Ebank.Controllers
         [HttpPost]
         public string GetHisList([FromBody]History history)
         {
+            if (history.Start_Date > history.End_Date)
+                return "";
+            DateTime beijing = DateTime.Now.ToUniversalTime().AddHours(8);
             var html = "";
-            if (history.Start_Date.Year == 1 || history.End_Date.Year == 1||history.Start_Date<DateTime.Now.AddMonths(-3))
+            if (history.Start_Date.Year == 1 || history.End_Date.Year == 1||history.Start_Date<beijing.AddMonths(-3))
             {
-                history.Start_Date = DateTime.Now.AddMonths(-3);
-                history.End_Date = DateTime.Now;
+                history.Start_Date = beijing.AddMonths(-3);
+                history.End_Date =beijing;
             }
             MysqlHelper mysqlhelper = new MysqlHelper();
            List<History> his_list =  mysqlhelper.GetHistory(history);
             foreach (History his in his_list)
             {
                
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",his.Type,his.From,his.To,his.Amount+" "+his.Currency,his.InsertTime);
+                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",his.Type,his.From,his.To,his.Amount+" "+his.Currency,his.Start_Date);
               
             }
             return html;
@@ -48,17 +51,20 @@ namespace Ebank.Controllers
         [HttpPost]
         public string GetOneHisList([FromBody]History history)
         {
+            if (history.Start_Date > history.End_Date)
+                return "";
+            DateTime beijing = DateTime.Now.ToUniversalTime().AddHours(8);
             var html = "";
-            if (history.Start_Date.Year == 1 || history.End_Date.Year == 1 || history.Start_Date < DateTime.Now.AddMonths(-3))
+            if (history.Start_Date.Year == 1 || history.End_Date.Year == 1 || history.Start_Date < beijing.AddMonths(-3))
             {
-                history.Start_Date = DateTime.Now.AddMonths(-3);
-                history.End_Date = DateTime.Now;
+                history.Start_Date = beijing.AddMonths(-3);
+                history.End_Date = beijing;
             }
             MysqlHelper mysqlhelper = new MysqlHelper();
             List<History> his_list = mysqlhelper.GetAccountHistory(history);
             foreach (History his in his_list)
             {
-                  html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>", his.Type, his.InsertTime,his.Amount, his.Currency);
+                  html += string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>", his.Type, his.Start_Date,his.Amount, his.Currency);
                
                
             }

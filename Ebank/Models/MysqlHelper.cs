@@ -7,7 +7,7 @@ namespace Ebank.Controllers
 {
     internal class MysqlHelper
     {
-        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn1"];
+        private static string connStr_local = System.Configuration.ConfigurationManager.AppSettings["Conn2"];
         public MysqlHelper()
         {
         }
@@ -58,6 +58,37 @@ namespace Ebank.Controllers
             return question_list;
         }
 
+        internal string CheckServoceCode(User users)
+        {
+            return "true";
+        }
+
+        internal string UpdatePassword(User user)
+        {
+            string sql = string.Format("update user set password='{0}' where id ='{0}'", user.New_Password);
+            string error = null;
+            MySqlConnection conn = null;
+            try
+            {
+                conn = new MySqlConnection(connStr_local);
+                conn.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, conn);
+                // 创建DataSet，用于存储数据.
+                DataSet testDataSet = new DataSet();
+                // 执行查询，并将数据导入DataSet.
+                adapter.Fill(testDataSet, "result_data");
+                return "Success";
+            }
+            catch (Exception t)
+            {
+                return "error";
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
         internal string CheckSession(User user)
         {
             string sql = string.Format("select * from user where id= '{0}'", user.Id);
@@ -75,7 +106,7 @@ namespace Ebank.Controllers
 
                 if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null && testDataSet.Tables["result_data"].Rows.Count > 0)
                 {
-                    if (user.Session == testDataSet.Tables["result_data"].Rows[0].ToString())
+                    if (user.Session == testDataSet.Tables["result_data"].Rows[0]["session"].ToString())
                     {
                         return "OK";
                     }
@@ -93,6 +124,10 @@ namespace Ebank.Controllers
             catch (Exception t)
             {
                 return "Error";
+            }
+            finally
+            {
+                conn.Close();
             }
 
         }
@@ -126,7 +161,11 @@ namespace Ebank.Controllers
             {
                 return "6";
             }
-         }
+            finally
+            {
+                conn.Close();
+            }
+        }
 
         internal string SetCommon(Saving saving)
         {
@@ -147,6 +186,10 @@ namespace Ebank.Controllers
             catch (Exception t)
             {
                 return "error";
+            }
+            finally
+            {
+                conn.Close();
             }
         }
 
@@ -267,12 +310,17 @@ namespace Ebank.Controllers
             {
                 return "error";
             }
+            finally
+            {
+                conn.Close();
+            }
         }
 
         internal void PushToRepayLog(Repay repayment)
         {
             string sql_1 = string.Format("insert into repayment_log set bill_id='{0}',amount='{1}',repay_account='{2}',type='{3}';", repayment.Bill_Id,repayment.Amount,repayment.Repay_Account,repayment.Type);
            string sql_2 = string.Format("update credit_bill set remain_repayment=remain_repayment-{0} where id ='{1}'",repayment.Amount,repayment.Bill_Id);
+           // string sql_3 = string.Format("update credit_bill set remain_repayment=remain_repayment-{0} where id ='{1}'", repayment.Amount, repayment.Bill_Id);
             string error = null;
             MySqlConnection conn = null;
             try
@@ -289,6 +337,10 @@ namespace Ebank.Controllers
             catch (Exception t)
             {
                
+            }
+            finally
+            {
+                conn.Close();
             }
         }
 
@@ -356,7 +408,7 @@ namespace Ebank.Controllers
         internal List<History> GetAccountHistory(History history)
         {
             List<History> list = new List<History>();
-            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.account='{0}' and l.date<='{1}' and l.date>='{2}' and l.type=t.id  and l.currency = c.id order by l.date desc", history.Account, history.End_Date, history.Start_Date);
+            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.account='{0}'  and l.type=t.id  and l.currency = c.id order by l.date desc", history.Account, history.End_Date, history.Start_Date);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -406,7 +458,12 @@ namespace Ebank.Controllers
                     one_history.Type = type;
                     one_history.Currency = currency;
                     one_history.Summary = summary;
-                    list.Add(one_history);
+                    one_history.Start_Date = Convert.ToDateTime(insert_time).AddHours(8);
+                    if (one_history.Start_Date >= history.Start_Date && one_history.Start_Date <= history.End_Date)
+                    {
+                        list.Add(one_history);
+                    }
+                    
 
                 }
             }
@@ -416,7 +473,7 @@ namespace Ebank.Controllers
         internal List<History> GetHistory(History history)
         {
             List<History> list = new List<History>();
-            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.user_id='{0}' and l.date<='{1}' and l.date>='{2}' and (l.type=1||l.type=5) and l.type=t.id and l.currency=c.id order by l.date desc", history.User_Id,history.End_Date,history.Start_Date);
+            string sql = string.Format("select * from consumption_log as l,log_type as t,currency as c where l.user_id='{0}' and (l.type=1||l.type=6) and l.type=t.id and l.currency=c.id order by l.date desc", history.User_Id,history.End_Date,history.Start_Date);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -456,6 +513,7 @@ namespace Ebank.Controllers
                     string amount = testRow["amount"].ToString();
                     string type = testRow["type_name"].ToString();
                     string summary = testRow["summary"].ToString();
+                    string date = testRow["date"].ToString();
                     one_history.From = From;
                     one_history.To = To;
                     one_history.InsertTime = insert_time;
@@ -463,8 +521,11 @@ namespace Ebank.Controllers
                     one_history.Currency = currency;
                     one_history.Status = status;
                     one_history.Type = type;
-                    list.Add(one_history);
-
+                    one_history.Start_Date = Convert.ToDateTime(date).AddHours(8);
+                    if (one_history.Start_Date >= history.Start_Date && one_history.Start_Date <= history.End_Date)
+                    {
+                        list.Add(one_history);
+                    }
                 }
             }
             return list;
@@ -486,11 +547,18 @@ namespace Ebank.Controllers
                 if (trans.Type == "4")
                 {
 
-                    adapter = new MySqlDataAdapter(sql_1 + sql_2 + sql_3+sql_4, conn);
+                    adapter = new MySqlDataAdapter(sql_1 + sql_2 + sql_3 + sql_4, conn);
                 }
                 else
                 {
-                    adapter = new MySqlDataAdapter(sql_1+sql_2, conn);
+                    if (trans.Type == "6")
+                    {
+                        adapter = new MySqlDataAdapter(sql_2, conn);
+                    }
+                    else
+                    {
+                        adapter = new MySqlDataAdapter(sql_1 + sql_2, conn);
+                    }
                 }
                 // 创建DataSet，用于存储数据.
                 DataSet testDataSet = new DataSet();
@@ -501,6 +569,10 @@ namespace Ebank.Controllers
             catch (Exception t)
             {
                 return "Error";
+            }
+            finally
+            {
+                conn.Close();
             }
         }
 
@@ -628,6 +700,10 @@ namespace Ebank.Controllers
             {
 
             }
+            finally
+            {
+                conn.Close();
+            }
         }
 
         internal string TransPush(Trans trans)
@@ -659,6 +735,10 @@ namespace Ebank.Controllers
             catch (Exception t)
             {
                 return "error";
+            }
+            finally
+            {
+                conn.Close();
             }
         }
 
@@ -711,7 +791,7 @@ namespace Ebank.Controllers
         internal List<Saving> GetAllSavingAccount(string user_id)
         {
             List<Saving> saving_list = new List<Saving>();
-            string sql = string.Format("select * from saving_account as s,currency as c,account_status as ast where  s.user_id ='{0}' and s.currency_id = c.id and s.status= ast.id", user_id);
+            string sql = string.Format("select * from saving_account as s,currency as c,account_status as ast,branch as b where  s.user_id ='{0}' and s.currency_id = c.id  and s.branch_id=b.id and s.status= ast.id", user_id);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -745,7 +825,7 @@ namespace Ebank.Controllers
                     string Account_Id = testRow["id"].ToString();
                     string card_num = testRow["card_num"].ToString();
                     string balance = testRow["balance"].ToString();
-                    string branch_id = testRow["branch_id"].ToString();
+                    string branch_id = testRow["branch_name"].ToString();
                     string expired_date = testRow["expired_date"].ToString();
                     string open_date = testRow["open_date"].ToString();
                     string currency_id = testRow["currency_name"].ToString();
@@ -788,6 +868,10 @@ namespace Ebank.Controllers
             catch (Exception t)
             {
 
+            }
+            finally
+            {
+                conn.Close();
             }
         }
 
@@ -853,7 +937,7 @@ namespace Ebank.Controllers
 
         internal bool UpdateTheUser(User user)
         {
-            string sql = string.Format("update user set name='{0}',password='{1}',sign_up_date='{2}',question_id='{3}',question_answer='{4}',status=1 where hk_id='{5}'",user.Name,user.Password, DateTime.Now.ToString("yyyy-MM-dd"),user.Question_Id,user.Question_Answer,user.Hk_Id);
+            string sql = string.Format("update user set name='{0}',password='{1}',sign_up_date='{2}',question_id='{3}',question_answer='{4}',status=1 and real_name='{6}' where hk_id='{5}'", user.Name,user.Password, DateTime.Now.ToString("yyyy-MM-dd"),user.Question_Id,user.Question_Answer,user.Hk_Id,user.RealName);
             string error = null;
             MySqlConnection conn = null;
             try
@@ -937,7 +1021,7 @@ namespace Ebank.Controllers
             {
                 conn.Close();
             }
-            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null)
+            if (testDataSet != null && testDataSet.Tables["result_data"] != null && testDataSet.Tables["result_data"].Rows != null&& testDataSet.Tables["result_data"].Rows.Count>0)
             {
                 user.Id = testDataSet.Tables["result_data"].Rows[0]["id"].ToString();
                 if (testDataSet.Tables["result_data"].Rows[0]["password"].ToString() == user.Password)
@@ -988,6 +1072,10 @@ namespace Ebank.Controllers
             {
 
             }
+            finally
+            {
+                conn.Close();
+            }
 
         }
 
@@ -1037,7 +1125,7 @@ namespace Ebank.Controllers
 
         internal bool CheckId(string hkid,string type)
         {
-            string sql = string.Format("select * from user where hk_id ='{0}' and hk_id_type='{1}'",hkid,type);
+            string sql = string.Format("select * from user where hk_id ='{0}' and hk_id_type='{1}' and status='1'",hkid,type);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try
@@ -1176,7 +1264,7 @@ namespace Ebank.Controllers
         public string SearchID(string name, string pass)
         {
             Question question = new Question();
-            string sql = string.Format("select * from user where name ='{0}' and password='{1}'",name,pass);
+            string sql = string.Format("select * from user where name ='{0}' and session='{1}'",name,pass);
             DataSet testDataSet = null;
             MySqlConnection conn = new MySqlConnection(connStr_local);
             try

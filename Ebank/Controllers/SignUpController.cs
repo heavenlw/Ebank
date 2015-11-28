@@ -35,7 +35,7 @@ namespace Ebank.Controllers
          // string value =   GetClientIp(null);
                 //MysqlHelper mysqlhelper = new MysqlHelper();
 
-                MysqlHelper mysqlhelper = new MysqlHelper();
+                        MysqlHelper mysqlhelper = new MysqlHelper();
                 //return mysqlhelper.GetQuestionList();
                 return mysqlhelper.CheckId(hkid,type);
         
@@ -47,12 +47,14 @@ namespace Ebank.Controllers
             return mysqlhelper.SearchName(name);
         }
         [HttpPost]
-        public bool CreateUser([FromBody]User users)
+        public string CreateUser([FromBody]User users)
         {
 
            
             MysqlHelper mysqlhelper = new MysqlHelper();
-          return   mysqlhelper.UpdateTheUser(users);
+           string data =   mysqlhelper.CheckServoceCode(users);
+          var succ=  mysqlhelper.UpdateTheUser(users);
+            return data;
         }
         [HttpPost]
         public string CreateAccount([FromBody]User users)

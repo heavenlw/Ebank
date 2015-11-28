@@ -35,7 +35,9 @@ E:\Github_Code\Ebank\Ebank\bin\MySql.Data.dll
 E:\Github_Code\Ebank\Ebank\bin\Newtonsoft.Json.dll
 E:\Github_Code\Ebank\Ebank\bin\Owin.dll
 E:\Github_Code\Ebank\Ebank\bin\System.Net.Http.Formatting.dll
+E:\Github_Code\Ebank\Ebank\bin\System.Web.Cors.dll
 E:\Github_Code\Ebank\Ebank\bin\System.Web.Helpers.dll
+E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Cors.dll
 E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.dll
 E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Owin.dll
 E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.WebHost.dll
@@ -49,6 +51,7 @@ E:\Github_Code\Ebank\Ebank\bin\WebGrease.dll
 E:\Github_Code\Ebank\Ebank\bin\HtmlAgilityPack.dll
 E:\Github_Code\Ebank\Ebank\bin\Awol.pdb
 E:\Github_Code\Ebank\Ebank\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Cors.xml
 E:\Github_Code\Ebank\Ebank\bin\Newtonsoft.Json.xml
 E:\Github_Code\Ebank\Ebank\bin\System.Net.Http.Formatting.xml
 E:\Github_Code\Ebank\Ebank\bin\System.Web.Helpers.xml
@@ -81,6 +84,3 @@ E:\Github_Code\Ebank\Ebank\bin\HtmlAgilityPack.xml
 E:\Github_Code\Ebank\Ebank\obj\Debug\Ebank.dll
 E:\Github_Code\Ebank\Ebank\obj\Debug\Ebank.pdb
 E:\Github_Code\Ebank\Ebank\obj\Debug\Ebank.csprojResolveAssemblyReference.cache
-E:\Github_Code\Ebank\Ebank\bin\System.Web.Cors.dll
-E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Cors.dll
-E:\Github_Code\Ebank\Ebank\bin\System.Web.Http.Cors.xml

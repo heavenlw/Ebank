@@ -15,7 +15,7 @@ namespace Ebank.Controllers
         {
 
             MysqlHelper mysqlhelper = new MysqlHelper();
-            var user_id = mysqlhelper.SearchID(user.Name, user.Password);
+            var user_id = mysqlhelper.SearchID(user.Name, user.Session);
             return mysqlhelper.GetAllCreditAccount(user_id);
         }
         [HttpPost]
